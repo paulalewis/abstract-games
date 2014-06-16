@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Abstract Games</string>
+    <string name="havannah">Havannah</string>
+    <string name="hex">Hex</string>
+    <string name="wiki_hex">http://en.wikipedia.org/wiki/Hex_(board_game)</string>
+    <string name="wiki_havannah">http://en.wikipedia.org/wiki/Havannah</string>
+    <string name="add_game">Add Game</string>
+    <string name="action_new_game">New Game</string>
+    <string name="action_undo_move">Undo Move</string>
+    <string name="action_about">About</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
