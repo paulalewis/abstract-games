@@ -1,129 +1,144 @@
 package com.castlefrog.games.asg;
 
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.PathShape;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import android.app.Activity;
-import android.view.View;
-import android.view.MotionEvent;
-import android.content.Context;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.PathShape;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Color;
-import android.graphics.PointF;
-
-import com.castlefrog.agl.Arbiter;
-import com.castlefrog.agl.Agent;
-import com.castlefrog.agl.agents.ExternalAgent;
-import com.castlefrog.agl.domains.havannah.HavannahAction;
-import com.castlefrog.agl.domains.havannah.HavannahState;
-import com.castlefrog.agl.domains.havannah.HavannahSimulator;
-
 public final class HavannahView extends View {
-    private static final int WIN_COLOR = 0xffffffff;
-    private static final int PADDING = 10;
     private static final int SCALE = 100;
 
-    private HavannahAction selected_;
     private Vector<Vector<PointF>> locations_;
-    private ShapeDrawable hexagon_;
-    //private ShapeDrawable circle_;
-    //private ShapeDrawable board_;
+    private ShapeDrawable hexagon;
     /** distance from center to corner */
     private float hexagonRadius_;
     private float hexagonCRadius_;
     private float boardWidth_;
     private float boardHeight_;
-    private int padding_;
+    private Point selectedHex;
 
-    private List<GameActivity.AgentColor> agentColors_;
-    private int[] boardColors_;
+    private int boardSize;
+    private byte[][] locationColors;
+    private List<Integer> paletteColors = new ArrayList<>();
+    private int boardOutlineColor = Color.WHITE;
+    private int lineColor = Color.BLACK;
 
     private Paint paint_ = new Paint();
+    private int paddingLeft;
+    private int paddingTop;
+    private int paddingRight;
+    private int paddingBottom;
+    private int contentWidth;
+    private int contentHeight;
 
-    private Arbiter<?, ?> arbiter_;
+    private HexBoardStyle boardStyle = HexBoardStyle.HEXAGONS;
+    private SelectActionListener selectActionListener;
 
-    //private HexBoardStyle boardStyle_ = HexBoardStyle.HEXAGONS;
+    public interface SelectActionListener {
+        void onActionSelected(int x, int y);
+    }
+
+    private class DummySelectActionListener implements SelectActionListener {
+        public void onActionSelected(int x, int y) {}
+    }
 
     public HavannahView(Context context) {
         super(context);
+        init(null, 0);
+    }
 
-        final float scale = getResources().getDisplayMetrics().density;
-        padding_ = (int) (PADDING * scale);
-        arbiter_ = ((GameActivity) context).getArbiter();
+    public HavannahView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(attrs, 0);
+    }
 
-        //Use an xml resource to recall selected board style and board color
-        //SharedPreferences settings = context.getSharedPreferences("havannah", Context.MODE_PRIVATE);
-        boardColors_ = new int[] {0xffffffff, 0xffaaaaaa};
-        agentColors_ = ((GameActivity) context).getAgentColors();
+    public HavannahView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init(attrs, defStyle);
+    }
 
-        int size = ((HavannahSimulator) arbiter_.getWorld()).getState().getSize();
-        hexagon_ = new ShapeDrawable(new PathShape(Utils.getHexagon(SCALE), 2 * SCALE, 2 * SCALE * Utils.HEXAGON_SHORT_RADIUS));
-        //circle_ = new ShapeDrawable(new OvalShape());
+    private void init(AttributeSet attrs, int defStyle) {
+        // Load attributes
+        final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0);
 
-        locations_ = new Vector<Vector<PointF>>();
-        locations_.setSize(size);
-        int sideLength = (size + 1) / 2;
+        boardSize = a.getInt(R.styleable.HexView_boardSize, boardSize);
+        int boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, Color.GRAY);
+        int agent1Color = a.getColor(R.styleable.HexView_agent1Color, Color.RED);
+        int agent2Color = a.getColor(R.styleable.HexView_agent2Color, Color.BLUE);
+        int connectionColor = a.getColor(R.styleable.HexView_connectionColor, Color.WHITE);
+        boardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, boardOutlineColor);
+        lineColor = a.getColor(R.styleable.HexView_lineColor, lineColor);
+
+        a.recycle();
+
+        paletteColors.add(boardBackgroundColor);
+        paletteColors.add(agent1Color);
+        paletteColors.add(agent2Color);
+        paletteColors.add(connectionColor);
+
+        hexagon = new ShapeDrawable(new PathShape(Utils.getHexagon(SCALE), 2 * SCALE, 2 * SCALE * Utils.HEXAGON_SHORT_RADIUS));
+        hexagon.getPaint().setAntiAlias(true);
+        hexagon.getPaint().setStrokeWidth(0.1f * SCALE);
+
+        locations_ = new Vector<>();
+        locations_.setSize(boardSize);
+        int sideLength = (boardSize + 1) / 2;
         for (int i = 0; i < sideLength; i += 1) {
             locations_.set(i, new Vector<PointF>());
             locations_.get(i).setSize(sideLength + i);
         }
-        for (int i = sideLength; i < size; i += 1) {
+        for (int i = sideLength; i < boardSize; i += 1) {
             locations_.set(i, new Vector<PointF>());
-            locations_.get(i).setSize(size + sideLength - i - 1);
+            locations_.get(i).setSize(boardSize + sideLength - i - 1);
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        float x = ev.getX();
-        float y = ev.getY();
-
-        View menuWindow = ((Activity) getContext()).findViewById(R.id.menuWindow);
-
-        if (menuWindow.getVisibility() != View.VISIBLE) {
+        if (isEnabled()) {
+            float x = ev.getX();
+            float y = ev.getY();
             switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
+                Point newSelected = null;
                 for (int i = 0; i < locations_.size(); i += 1) {
                     for (int j = 0; j < locations_.get(i).size(); j += 1) {
                         PointF point = locations_.get(i).get(j);
                         float dx = point.x - x;
                         float dy = point.y - y;
                         if (Math.hypot(dx, dy) < hexagonCRadius_) {
-                            HavannahSimulator simulator = (HavannahSimulator) arbiter_.getWorld();
-                            HavannahState state = simulator.getState();
                             int dj = j;
                             if (i > locations_.size() / 2) {
                                 dj += i - locations_.size() / 2;
                             }
-                            HavannahAction action = HavannahAction.valueOf(i , dj);
-                            int agentTurn = state.getAgentTurn();
-                            List<HavannahAction> legalActions = simulator.getLegalActions(agentTurn);
-                            List<Agent> agents = arbiter_.getAgents();
-                            if (agents.get(agentTurn) instanceof ExternalAgent && legalActions.contains(action)) {
-                                selected_ = action;
-                                invalidate();
-                                return true;
-                            }
+                            newSelected = new Point(i, dj);
                         }
                     }
                 }
-                if (selected_ != null) {
-                    selected_ = null;
+                if (selectedHex == null || !selectedHex.equals(newSelected)) {
+                    selectedHex = null;
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (selected_ != null) {
-                    ((GameActivity) getContext()).inputAction(selected_);
-                    selected_ = null;
+                if (selectedHex != null) {
+                    selectActionListener.onActionSelected(selectedHex.x, selectedHex.y);
+                    selectedHex = null;
                     invalidate();
                 }
-                break;
-            default:
                 break;
             }
         }
@@ -133,15 +148,16 @@ public final class HavannahView extends View {
     @Override
     public void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        int paddedWidth = width - padding_;
-        int paddedHeight = height - padding_;
+        paddingLeft = getPaddingLeft();
+        paddingTop = getPaddingTop();
+        paddingRight = getPaddingRight();
+        paddingBottom = getPaddingBottom();
+        contentWidth = width - paddingLeft - paddingRight;
+        contentHeight = height - paddingTop - paddingBottom;
 
-        HavannahSimulator simulator = (HavannahSimulator) arbiter_.getWorld();
-
-        int size = simulator.getState().getSize();
-        boardWidth_ = Math.min(paddedWidth, paddedHeight);
-        boardHeight_ = boardWidth_ * (2 * Utils.HEXAGON_SHORT_RADIUS * size) / (Utils.HEXAGON_RADIUS * (1.5f * size + 0.5f));
-        hexagonCRadius_ = boardHeight_ / (2 * size);
+        boardWidth_ = Math.min(contentWidth, contentHeight);
+        boardHeight_ = boardWidth_ * (2 * Utils.HEXAGON_SHORT_RADIUS * boardSize) / (Utils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f));
+        hexagonCRadius_ = boardHeight_ / (2 * boardSize);
         hexagonRadius_ = hexagonCRadius_ / Utils.HEXAGON_SHORT_RADIUS;
         float xPadding = (width - boardWidth_) / 2;
         float yPadding = (height - boardHeight_) / 2;
@@ -149,17 +165,16 @@ public final class HavannahView extends View {
         float x0 = xPadding + boardWidth_ / 2;
         float y0 = yPadding + hexagonCRadius_;
 
-        for (int i = 0; i < size / 2 + 1; i += 1) {
+        for (int i = 0; i < boardSize / 2 + 1; i += 1) {
             for (int j = 0; j < locations_.get(i).size(); j += 1) {
                 locations_.get(i).set(j, new PointF(x0 + (j - i) * 1.5f * hexagonRadius_, y0 + (i + j) * hexagonCRadius_));
             }
         }
-        float x02 = x0 - (size / 2) * hexagonRadius_ * 3 / 2;
-        float y02 = y0 + (size / 2) * hexagonCRadius_;
-        for (int i = size / 2 + 1; i < size; i += 1) {
+        float x02 = x0 - (boardSize / 2) * hexagonRadius_ * 3 / 2;
+        float y02 = y0 + (boardSize / 2) * hexagonCRadius_;
+        for (int i = boardSize / 2 + 1; i < boardSize; i += 1) {
             for (int j = 0; j < locations_.get(i).size(); j += 1) {
-                locations_.get(i).set(j,
-                        new PointF(x02 + j * 1.5f * hexagonRadius_, y02 + (2 * (i - size / 2) + j) * hexagonCRadius_));
+                locations_.get(i).set(j, new PointF(x02 + j * 1.5f * hexagonRadius_, y02 + (2 * (i - boardSize / 2) + j) * hexagonCRadius_));
             }
         }
     }
@@ -167,57 +182,33 @@ public final class HavannahView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        HavannahSimulator simulator = (HavannahSimulator) arbiter_.getWorld();
-        HavannahState state = simulator.getState();
         //draw board
         for (int i = 0; i < locations_.size(); i += 1) {
             for (int j = 0; j < locations_.get(i).size(); j += 1) {
-                hexagon_.getPaint().setStyle(Paint.Style.FILL);
+                hexagon.getPaint().setStyle(Paint.Style.FILL);
                 PointF point = locations_.get(i).get(j);
-                hexagon_.setBounds((int) (point.x - hexagonRadius_),
-                                   (int) (point.y - hexagonCRadius_),
-                                   (int) (point.x + hexagonRadius_),
-                                   (int) (point.y + hexagonCRadius_));
+                hexagon.setBounds((int) (point.x - hexagonRadius_),
+                                  (int) (point.y - hexagonCRadius_),
+                                  (int) (point.x + hexagonRadius_),
+                                  (int) (point.y + hexagonCRadius_));
                 if (i > locations_.size() / 2) {
                     int dj = j + i - locations_.size() / 2;
-                    //draw winning connection
-                    if (state.getLocation(i, dj) != 0) {
-                        hexagon_.getPaint().setColor(agentColors_.get(state.getLocation(i, dj) - 1).intValue());
-                    } else {
-                        hexagon_.getPaint().setColor(boardColors_[1]);
-                    }
+                    //hexagon.getPaint().setColor(paletteColors.get(state.getLocation(i, dj)));
                 } else {
-                    //draw winning connection
-                    if (state.getLocation(i, j) != 0) {
-                        hexagon_.getPaint().setColor(agentColors_.get(state.getLocation(i, j) - 1).intValue());
-                    } else {
-                        hexagon_.getPaint().setColor(boardColors_[1]);
-                    }
+                    //hexagon.getPaint().setColor(paletteColors.get(state.getLocation(i, j)));
                 }
-                hexagon_.draw(canvas);
+                hexagon.draw(canvas);
                 //draw board outline
-                hexagon_.getPaint().setStyle(Paint.Style.STROKE);
-                hexagon_.getPaint().setColor(boardColors_[0]);
-                hexagon_.getPaint().setStrokeWidth(0.1f * SCALE);
-                hexagon_.draw(canvas);
+                hexagon.getPaint().setStyle(Paint.Style.STROKE);
+                hexagon.getPaint().setColor(boardOutlineColor);
+                hexagon.getPaint().setStrokeWidth(0.1f * SCALE);
+                hexagon.draw(canvas);
             }
         }
-        // draw winning connection
-        List<HavannahAction> connection = simulator.getWinningConnection();
-        for (HavannahAction location : connection) {
-            hexagon_.getPaint().setStyle(Paint.Style.FILL);
-            hexagon_.getPaint().setColor(WIN_COLOR);
-            PointF point = locations_.get(location.getX()).get(location.getY());
-            hexagon_.setBounds((int) (point.x - hexagonRadius_),
-                               (int) (point.y - hexagonCRadius_),
-                               (int) (point.x + hexagonRadius_),
-                               (int) (point.y + hexagonCRadius_));
-            hexagon_.draw(canvas);
-        }
-        //draw selected lines
-        if (selected_ != null) {
-            int y = selected_.getY();
-            int x = selected_.getX();
+        //draw selectedHex lines
+        if (selectedHex != null) {
+            int y = selectedHex.x;
+            int x = selectedHex.y;
             paint_.setStyle(Paint.Style.STROKE);
             paint_.setColor(Color.BLACK);
             paint_.setStrokeWidth(4f);

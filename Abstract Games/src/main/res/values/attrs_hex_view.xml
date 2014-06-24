@@ -1,9 +1,11 @@
 <resources>
     <declare-styleable name="HexView">
         <attr name="boardSize" format="integer" />
+        <attr name="boardBackgroundColor" format="color" />
         <attr name="agent1Color" format="color" />
         <attr name="agent2Color" format="color" />
-        <attr name="boardBackgroundColor" format="color" />
+        <attr name="connectionColor" format="color" />
         <attr name="boardOutlineColor" format="color" />
+        <attr name="lineColor" format="color" />
     </declare-styleable>
 </resources>

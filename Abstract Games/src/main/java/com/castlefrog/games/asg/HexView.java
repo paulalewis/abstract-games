@@ -1,6 +1,5 @@
 package com.castlefrog.games.asg;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -19,23 +18,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class HexView extends View {
-    private static final int WIN_COLOR = 0xffffffff;
     private static final int SCALE = 100;
+    private static final int DEFAULT_BOARD_SIZE = 5;
+    public static final int BACKGROUND_COLOR_VALUE = 0;
+    public static final int AGENT1_COLOR_VALUE = 1;
+    public static final int AGENT2_COLOR_VALUE = 2;
+    public static final int CONNECTION_COLOR_VALUE = 3;
 
     private PointF[][] locations;
     private ShapeDrawable hexagon;
     /** Distance from center to corner */
     private float hexagonRadius;
     private float hexagonCRadius;
-    private Point selectedHex;
-    private List<Point> connection;
 
     private byte[][] locationColors;
-    private List<Color> agentColorPalette;
-    private List<Integer> agentColors = new ArrayList<>();
-    private int boardBackgroundColor = Color.GRAY;
+    private List<Integer> paletteColors = new ArrayList<>();
     private int boardOutlineColor = Color.WHITE;
-    private int connectionColor = Color.WHITE;
+    private int lineColor = Color.BLACK;
 
     private int paddingLeft;
     private int paddingTop;
@@ -47,10 +46,16 @@ public final class HexView extends View {
     private Path path = new Path();
 
     private int boardSize;
+    private HexBoardStyle boardStyle = HexBoardStyle.HEXAGONS;
+    private SelectActionListener selectActionListener = new DummySelectActionListener();
+    private Point selectedHex;
 
-    public interface EventListener {
-        void onCellHover(int x, int y);
-        void onCellSelected(int x, int y);
+    public interface SelectActionListener {
+        void onActionSelected(int x, int y);
+    }
+
+    private class DummySelectActionListener implements SelectActionListener {
+        public void onActionSelected(int x, int y) {}
     }
 
     public HexView(Context context) {
@@ -72,22 +77,27 @@ public final class HexView extends View {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0);
 
-        boardSize = a.getInt(R.styleable.HexView_boardSize, boardSize);
+        boardSize = a.getInt(R.styleable.HexView_boardSize, DEFAULT_BOARD_SIZE);
+        int boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, Color.GRAY);
         int agent1Color = a.getColor(R.styleable.HexView_agent1Color, Color.RED);
         int agent2Color = a.getColor(R.styleable.HexView_agent2Color, Color.BLUE);
-        boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, boardBackgroundColor);
+        int connectionColor = a.getColor(R.styleable.HexView_connectionColor, Color.WHITE);
         boardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, boardOutlineColor);
+        lineColor = a.getColor(R.styleable.HexView_lineColor, lineColor);
 
         a.recycle();
 
-        agentColors.set(0, agent1Color);
-        agentColors.set(1, agent2Color);
+        paletteColors.add(boardBackgroundColor);
+        paletteColors.add(agent1Color);
+        paletteColors.add(agent2Color);
+        paletteColors.add(connectionColor);
 
         hexagon = new ShapeDrawable(new PathShape(Utils.getHexagon(SCALE), 2 * SCALE, 2 * SCALE * Utils.HEXAGON_SHORT_RADIUS));
         hexagon.getPaint().setAntiAlias(true);
         hexagon.getPaint().setStrokeWidth(0.1f * SCALE);
 
         locations = new PointF[boardSize][boardSize];
+        locationColors = new byte[boardSize][boardSize];
     }
 
     @Override
@@ -98,39 +108,26 @@ public final class HexView extends View {
             switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
-                for (int i = 0; i < locations.length; i += 1) {
-                    for (int j = 0; j < locations.length; j += 1) {
+                Point newSelected = null;
+                for (int i = 0; i < boardSize; i += 1) {
+                    for (int j = 0; j < boardSize; j += 1) {
                         PointF point = locations[i][j];
                         if (Math.hypot(point.x - x, point.y - y) < hexagonCRadius) {
-                            HexSimulator simulator = (HexSimulator) arbiter_.getWorld();
-                            HexState state = simulator.getState();
-                            HexAction action = HexAction.valueOf(i , j);
-                            int agentTurn = state.getAgentTurn();
-                            List<HexAction> legalActions = simulator.getLegalActions(agentTurn);
-                            List<Agent> agents = arbiter_.getAgents();
-                            if (agents.get(agentTurn) instanceof ExternalAgent && legalActions.contains(action)) {
-                                if (selected_ == null || !selected_.equals(action)) {
-                                    selected_ = action;
-                                    invalidate();
-                                }
-                                return true;
-                            }
+                            newSelected = new Point(i, j);
                         }
                     }
                 }
-                if (selected_ != null) {
-                    selected_ = null;
+                if (selectedHex == null || !selectedHex.equals(newSelected)) {
+                    selectedHex = newSelected;
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                if (selected_ != null) {
-                    ((GameActivity) getContext()).inputAction(selected_);
-                    selected_ = null;
+                if (selectedHex != null) {
+                    selectActionListener.onActionSelected(selectedHex.x, selectedHex.y);
+                    selectedHex = null;
                     invalidate();
                 }
-                break;
-            default:
                 break;
             }
         }
@@ -177,23 +174,21 @@ public final class HexView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        byte[][] locations = state.getLocations();
-
         //draw board outer edges
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(agentColors.get(0));
-        PointF p1 = getCorner(this.locations[0][0], -2, 0);
-        PointF p2 = this.locations[0][boardSize - 1];
+        paint.setColor(paletteColors.get(0));
+        PointF p1 = getCorner(locations[0][0], -2, 0);
+        PointF p2 = locations[0][boardSize - 1];
         canvas.drawRect(p1.x, p1.y, p2.x, p2.y, paint);
-        p1 = getCorner(this.locations[boardSize - 1][0], 2, 0);
-        p2 = this.locations[boardSize - 1][boardSize - 1];
+        p1 = getCorner(locations[boardSize - 1][0], 2, 0);
+        p2 = locations[boardSize - 1][boardSize - 1];
         canvas.drawRect(p1.x, p1.y, p2.x, p2.y, paint);
 
-        paint.setColor(agentColors.get(1));
-        p1 = getCorner(this.locations[0][0], -1, -1);
-        p2 = getCorner(this.locations[boardSize - 1][0], -1, -1);
-        PointF p3 = this.locations[boardSize - 1][0];
-        PointF p4 = this.locations[0][0];
+        paint.setColor(paletteColors.get(1));
+        p1 = getCorner(locations[0][0], -1, -1);
+        p2 = getCorner(locations[boardSize - 1][0], -1, -1);
+        PointF p3 = locations[boardSize - 1][0];
+        PointF p4 = locations[0][0];
         path.reset();
         path.moveTo(p1.x, p1.y);
         path.lineTo(p2.x, p2.y);
@@ -201,10 +196,10 @@ public final class HexView extends View {
         path.lineTo(p4.x, p4.y);
         path.close();
         canvas.drawPath(path, paint);
-        p1 = getCorner(this.locations[0][boardSize - 1], 1, 1);
-        p2 = getCorner(this.locations[boardSize - 1][boardSize - 1], 1, 1);
-        p3 = this.locations[boardSize - 1][boardSize - 1];
-        p4 = this.locations[0][boardSize - 1];
+        p1 = getCorner(locations[0][boardSize - 1], 1, 1);
+        p2 = getCorner(locations[boardSize - 1][boardSize - 1], 1, 1);
+        p3 = locations[boardSize - 1][boardSize - 1];
+        p4 = locations[0][boardSize - 1];
         path.reset();
         path.moveTo(p1.x, p1.y);
         path.lineTo(p2.x, p2.y);
@@ -214,36 +209,20 @@ public final class HexView extends View {
         canvas.drawPath(path, paint);
 
         // draw board background
-        for (int i = 0; i < locations.length; i += 1) {
-            for (int j = 0; j < locations[i].length; j += 1) {
+        for (int i = 0; i < boardSize; i += 1) {
+            for (int j = 0; j < boardSize; j += 1) {
                 hexagon.getPaint().setStyle(Paint.Style.FILL);
-                PointF point = this.locations[i][j];
+                PointF point = locations[i][j];
                 hexagon.setBounds((int) (point.x - hexagonRadius),
                         (int) (point.y - hexagonCRadius),
                         (int) (point.x + hexagonRadius),
                         (int) (point.y + hexagonCRadius));
-                if (locations[i][j] != 0) {
-                    hexagon.getPaint().setColor(agentColors.get(locations[i][j] - 1));
-                } else {
-                    hexagon.getPaint().setColor(boardBackgroundColor);
-                }
+                hexagon.getPaint().setColor(paletteColors.get(locationColors[i][j]));
                 hexagon.draw(canvas);
             }
         }
-        // draw winning connection
-        List<HexAction> connection = simulator.getWinningConnection();
-        for (HexAction location : connection) {
-            hexagon.getPaint().setStyle(Paint.Style.FILL);
-            hexagon.getPaint().setColor(WIN_COLOR);
-            PointF point = this.locations[location.getX()][location.getY()];
-            hexagon.setBounds((int) (point.x - hexagonRadius),
-                    (int) (point.y - hexagonCRadius),
-                    (int) (point.x + hexagonRadius),
-                    (int) (point.y + hexagonCRadius));
-            hexagon.draw(canvas);
-        }
         // draw board inner edges
-        for (PointF[] row: this.locations) {
+        for (PointF[] row: locations) {
             for (PointF point: row) {
                 hexagon.getPaint().setStyle(Paint.Style.STROKE);
                 hexagon.getPaint().setColor(boardOutlineColor);
@@ -259,12 +238,12 @@ public final class HexView extends View {
             int y = selectedHex.y;
             int x = selectedHex.x;
             paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.BLACK);
+            paint.setColor(lineColor);
             paint.setStrokeWidth(4f);
-            PointF p1i = this.locations[x][0];
-            PointF p1f = this.locations[x][this.locations.length - 1];
-            PointF p2i = this.locations[0][y];
-            PointF p2f = this.locations[this.locations.length - 1][y];
+            PointF p1i = locations[x][0];
+            PointF p1f = locations[x][locations.length - 1];
+            PointF p2i = locations[0][y];
+            PointF p2f = locations[locations.length - 1][y];
             canvas.drawLine(p1i.x, p1i.y, p1f.x, p1f.y, paint);
             canvas.drawLine(p2i.x, p2i.y, p2f.x, p2f.y, paint);
         }
@@ -279,30 +258,39 @@ public final class HexView extends View {
         invalidate();
     }
 
+    public int getBoardBackgroundColor() {
+        return paletteColors.get(BACKGROUND_COLOR_VALUE);
+    }
+
+    public void setBoardBackgroundColor(int boardBackgroundColor) {
+        paletteColors.set(BACKGROUND_COLOR_VALUE, boardBackgroundColor);
+        invalidate();
+    }
+
     public int getAgent1Color() {
-        return agentColors.get(0);
+        return paletteColors.get(AGENT1_COLOR_VALUE);
     }
 
     public void setAgent1Color(int agent1Color) {
-        agentColors.set(0, agent1Color);
+        paletteColors.set(AGENT1_COLOR_VALUE, agent1Color);
         invalidate();
     }
 
     public int getAgent2Color() {
-        return agentColors.get(1);
+        return paletteColors.get(AGENT2_COLOR_VALUE);
     }
 
     public void setAgent2Color(int agent2Color) {
-        agentColors.set(1, agent2Color);
+        paletteColors.set(AGENT2_COLOR_VALUE, agent2Color);
         invalidate();
     }
 
-    public int getBoardBackgroundColor() {
-        return boardBackgroundColor;
+    public int getConnectionColor() {
+        return paletteColors.get(CONNECTION_COLOR_VALUE);
     }
 
-    public void setBoardBackgroundColor(int boardBackgroundColor) {
-        this.boardBackgroundColor = boardBackgroundColor;
+    public void setConnectionColor(int connectionColor) {
+        paletteColors.set(CONNECTION_COLOR_VALUE, connectionColor);
         invalidate();
     }
 
@@ -315,12 +303,7 @@ public final class HexView extends View {
         invalidate();
     }
 
-    public int getConnectionColor() {
-        return connectionColor;
-    }
-
-    public void setConnectionColor(int connectionColor) {
-        this.connectionColor = connectionColor;
-        invalidate();
+    public void setSelectActionListener(SelectActionListener listener) {
+        selectActionListener = (listener == null) ? new DummySelectActionListener() : listener;
     }
 }
