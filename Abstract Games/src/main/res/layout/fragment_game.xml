@@ -1,5 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/gameWindow"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_height="match_parent"
+    tools:context="com.castlefrog.games.asg.GameFragment">
+
+    <com.castlefrog.games.asg.HexView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        custom:boardSize="5"
+        custom:boardBackgroundColor="@android:color/darker_gray" />
+
+</FrameLayout>
