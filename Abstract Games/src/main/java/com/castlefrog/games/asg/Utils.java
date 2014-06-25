@@ -11,7 +11,7 @@ public class Utils {
      * @param radius
      * @return a Path object in the shape of a hexagon
      */
-    public static Path getHexagon(int radius) {
+    public static Path getHexagon(float radius) {
         Path path = new Path();
         path.moveTo(HEXAGON_HALF_RADIUS * radius, 0);
         path.rLineTo(HEXAGON_RADIUS * radius, 0);
