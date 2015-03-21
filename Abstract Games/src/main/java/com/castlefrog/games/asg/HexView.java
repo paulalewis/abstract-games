@@ -144,18 +144,18 @@ public final class HexView extends View {
 
         float maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f);
         float maxHexHeight = (2 * contentHeight) / (3 * boardSize - 1);
-        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / Utils.HEXAGON_SHORT_RADIUS) / 2;
-        hexagonCRadius = Utils.HEXAGON_SHORT_RADIUS * hexagonRadius;
+        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2;
+        hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius;
         float boardWidth = hexagonRadius * (1.5f * boardSize + 0.5f);
         float boardHeight = hexagonCRadius * (3 * boardSize - 1);
         float xPadding = (width - boardWidth) / 2;
         float yPadding = (height - boardHeight) / 2;
         float yAdjust = hexagonCRadius * (boardSize - 1);
-        hexagon = Utils.getHexagon(hexagonRadius);
+        hexagon = PathUtils.getHexagon(hexagonRadius);
         lineWidth = hexagonRadius * LINE_WIDTH_RATIO;
 
         float x0 = xPadding + hexagonRadius;
-        float y0 = yAdjust + yPadding + (Utils.HEXAGON_SHORT_RADIUS * hexagonRadius);
+        float y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius);
         for (int i = 0; i < boardSize; i += 1) {
             for (int j = 0; j < boardSize; j += 1) {
                 locations[i][j] = new PointF(x0 + i * hexagonRadius * 1.5f,
@@ -167,8 +167,8 @@ public final class HexView extends View {
     private PointF getCorner(PointF location,
                              int xChange,
                              int yChange) {
-        return new PointF((location.x + xChange * Utils.HEXAGON_HALF_RADIUS * hexagonRadius),
-                          (location.y + yChange * Utils.HEXAGON_SHORT_RADIUS * hexagonRadius));
+        return new PointF((location.x + xChange * PathUtils.HEXAGON_HALF_RADIUS * hexagonRadius),
+                          (location.y + yChange * PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius));
     }
 
     @Override

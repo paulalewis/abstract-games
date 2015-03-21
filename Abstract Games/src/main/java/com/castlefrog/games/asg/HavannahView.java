@@ -158,10 +158,10 @@ public final class HavannahView extends View {
         contentHeight = height - paddingTop - paddingBottom;
 
         boardWidth = Math.min(contentWidth, contentHeight);
-        boardHeight = boardWidth * (2 * Utils.HEXAGON_SHORT_RADIUS * boardSize) / (Utils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f));
+        boardHeight = boardWidth * (2 * PathUtils.HEXAGON_SHORT_RADIUS * boardSize) / (PathUtils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f));
         hexagonCRadius = boardHeight / (2 * boardSize);
-        hexagonRadius = hexagonCRadius / Utils.HEXAGON_SHORT_RADIUS;
-        hexagon = Utils.getHexagon(hexagonRadius);
+        hexagonRadius = hexagonCRadius / PathUtils.HEXAGON_SHORT_RADIUS;
+        hexagon = PathUtils.getHexagon(hexagonRadius);
         lineWidth = hexagonRadius * LINE_WIDTH_RATIO;
         float xPadding = (width - boardWidth) / 2;
         float yPadding = (height - boardHeight) / 2;
