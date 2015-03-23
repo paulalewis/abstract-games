@@ -35,10 +35,13 @@ public class GameFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val bundle = savedInstanceState ?: getArguments()
         gameType = bundle.getString(ARG_GAME_TYPE)
-        val actionBar: ActionBar? = getActivity().getActionBar()
-        actionBar?.setTitle(gameType)
         //val resId = getResources().getIdentifier("help_uri_" + gameType, "string", getActivity().getPackageName())
         //helpUri = Uri.parse(getString(resId))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getActivity().getActionBar().setTitle(gameType)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

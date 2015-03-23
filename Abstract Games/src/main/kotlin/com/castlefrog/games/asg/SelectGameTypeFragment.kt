@@ -36,7 +36,7 @@ class SelectGameTypeFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val fragment = GameFragment.newInstance(contents.get(position).first)
                 getFragmentManager().addOnBackStackChangedListener({
-                    if (getFragmentManager().getBackStackEntryCount() == 1) {
+                    if (getFragmentManager().getBackStackEntryCount() == 0) {
                         getActivity().getActionBar().setTitle(R.string.app_name)
                     }
                 })
