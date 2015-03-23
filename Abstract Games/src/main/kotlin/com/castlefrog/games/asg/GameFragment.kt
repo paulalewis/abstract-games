@@ -29,7 +29,6 @@ public class GameFragment : Fragment() {
     private val arbiter: Arbiter<*, *>? = null
     private val agents: List<Agent>? = null
     private var helpUri: Uri? = null
-
     private var gameType = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {

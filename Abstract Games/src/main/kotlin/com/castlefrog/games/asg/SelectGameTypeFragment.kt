@@ -41,8 +41,8 @@ class SelectGameTypeFragment : Fragment() {
                     }
                 })
                 getFragmentManager().beginTransaction()
-                        .add(fragment, "GameFragment")
-                        .addToBackStack("GameFragment")
+                        .add(R.id.container, fragment, null)
+                        .addToBackStack(null)
                         .commit()
             }
         }))
