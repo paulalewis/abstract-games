@@ -11,6 +11,11 @@ import java.util.Vector
 
 public class HavannahView : View {
 
+    companion object {
+        private val DEFAULT_BOARD_SIZE = 5
+        private val LINE_WIDTH_RATIO = 0.1f
+    }
+
     private var locations: Vector<Vector<PointF>>? = null
     private var hexagon: Path? = null
     /** distance from center to corner  */
@@ -38,9 +43,7 @@ public class HavannahView : View {
     private var lineWidth: Float = 0f
 
     private val boardStyle = HexBoardStyle.HEXAGONS
-    private var selectActionListener: SelectActionListener<HavannahAction> = object: SelectActionListener<HavannahAction> {
-        override public fun onActionSelected(action: HavannahAction) {}
-    }
+    private var selectActionListener: SelectActionListener<HavannahAction> = DummySelectActionListener()
 
     public constructor(context: Context) : super(context) {
         init(null, 0)
@@ -240,10 +243,5 @@ public class HavannahView : View {
             canvas.drawLine(p1i.x, p1i.y, p1f.x, p1f.y, paint)
             canvas.drawLine(p2i.x, p2i.y, p2f.x, p2f.y, paint)
         }
-    }
-
-    companion object {
-        private val DEFAULT_BOARD_SIZE = 5
-        private val LINE_WIDTH_RATIO = 0.1.toFloat()
     }
 }

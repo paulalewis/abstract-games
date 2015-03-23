@@ -49,10 +49,6 @@ public class HexView : View {
     private val myMatrix = Matrix()
     var selectActionListener: SelectActionListener<HexAction> = DummySelectActionListener()
 
-    private inner class DummySelectActionListener : SelectActionListener<HexAction> {
-        override fun onActionSelected(action: HexAction) {}
-    }
-
     public constructor(context: Context) : super(context) {
         init(null, 0)
     }
