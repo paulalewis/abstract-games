@@ -5,20 +5,9 @@
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
-    <group android:id="@+id/game_items"
-        android:visible="true"
-        android:enabled="true">
-        <item android:id="@+id/new_game"
-            android:title="@string/action_new_game"
-            android:icon="@drawable/ic_action_refresh"
-            android:showAsAction="ifRoom"/>
-        <item android:id="@+id/undo_move"
-            android:title="@string/action_undo_move"
-            android:icon="@drawable/ic_action_undo"
-            android:showAsAction="ifRoom"/>
-        <item android:id="@+id/about"
-            android:title="@string/action_about"
-            android:icon="@drawable/ic_action_about"
-            android:showAsAction="ifRoom"/>
-    </group>
+    <item android:id="@+id/action_about"
+        android:title="@string/action_about"
+        android:orderInCategory="90"
+        android:icon="@drawable/ic_action_about"
+        android:showAsAction="ifRoom"/>
 </menu>
