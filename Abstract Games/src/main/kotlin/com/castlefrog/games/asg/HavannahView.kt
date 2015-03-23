@@ -16,7 +16,7 @@ public class HavannahView : View {
         private val LINE_WIDTH_RATIO = 0.1f
     }
 
-    private var locations: Vector<Vector<PointF>>? = null
+    private var locations: Vector<Vector<PointF>> = Vector()
     private var hexagon: Path? = null
     /** distance from center to corner  */
     private var hexagonRadius: Float = 0f
@@ -42,8 +42,7 @@ public class HavannahView : View {
     private var contentHeight: Int = 0
     private var lineWidth: Float = 0f
 
-    private val boardStyle = HexBoardStyle.HEXAGONS
-    private var selectActionListener: SelectActionListener<HavannahAction> = DummySelectActionListener()
+    public var selectActionListener: SelectActionListener<HavannahAction> = DummySelectActionListener()
 
     public constructor(context: Context) : super(context) {
         init(null, 0)
@@ -76,24 +75,15 @@ public class HavannahView : View {
         paletteColors.add(agent2Color)
         paletteColors.add(connectionColor)
 
-        locations = Vector<Vector<PointF>>()
-        locations!!.setSize(boardSize)
+        locations.setSize(boardSize)
         val sideLength = (boardSize + 1) / 2
-        run {
-            var i = 0
-            while (i < sideLength) {
-                locations!!.set(i, Vector<PointF>())
-                locations!!.get(i).setSize(sideLength + i)
-                i += 1
-            }
+        for (i in 0..sideLength - 1) {
+            locations.set(i, Vector<PointF>())
+            locations.get(i).setSize(sideLength + i)
         }
-        run {
-            var i = sideLength
-            while (i < boardSize) {
-                locations!!.set(i, Vector<PointF>())
-                locations!!.get(i).setSize(boardSize + sideLength - i - 1)
-                i += 1
-            }
+        for (i in sideLength..boardSize - 1) {
+            locations.set(i, Vector<PointF>())
+            locations.get(i).setSize(boardSize + sideLength - i - 1)
         }
 
         locationColors = Array(boardSize, { ByteArray(boardSize) })
@@ -108,17 +98,17 @@ public class HavannahView : View {
                     var newSelected: Point? = null
                     run {
                         var i = 0
-                        while (i < locations!!.size()) {
+                        while (i < locations.size()) {
                             run {
                                 var j = 0
-                                while (j < locations!!.get(i).size()) {
-                                    val point = locations!!.get(i).get(j)
+                                while (j < locations.get(i).size()) {
+                                    val point = locations.get(i).get(j)
                                     val dx = point.x - x
                                     val dy = point.y - y
                                     if (Math.hypot(dx.toDouble(), dy.toDouble()) < hexagonCRadius) {
                                         var dj = j
-                                        if (i > locations!!.size() / 2) {
-                                            dj += i - locations!!.size() / 2
+                                        if (i > locations.size() / 2) {
+                                            dj += i - locations.size() / 2
                                         }
                                         newSelected = Point(i, dj)
                                     }
@@ -164,32 +154,17 @@ public class HavannahView : View {
         val x0 = xPadding + boardWidth / 2
         val y0 = yPadding + hexagonCRadius
 
-        run {
-            var i = 0
-            while (i < boardSize / 2 + 1) {
-                run {
-                    var j = 0
-                    while (j < locations!!.get(i).size()) {
-                        locations!!.get(i).set(j, PointF(x0 + (j - i).toFloat() * 1.5.toFloat() * hexagonRadius, y0 + (i + j).toFloat() * hexagonCRadius))
-                        j += 1
-                    }
-                }
-                i += 1
+        for (i in 0..boardSize / 2) {
+            for (j in 0..locations.get(i).size() - 1) {
+                locations.get(i).set(j, PointF(x0 + (j - i).toFloat() * 1.5f * hexagonRadius, y0 + (i + j).toFloat() * hexagonCRadius))
             }
         }
+
         val x02 = x0 - (boardSize / 2).toFloat() * hexagonRadius * 3 / 2
         val y02 = y0 + (boardSize / 2).toFloat() * hexagonCRadius
-        run {
-            var i = boardSize / 2 + 1
-            while (i < boardSize) {
-                run {
-                    var j = 0
-                    while (j < locations!!.get(i).size()) {
-                        locations!!.get(i).set(j, PointF(x02 + j.toFloat() * 1.5.toFloat() * hexagonRadius, y02 + (2 * (i - boardSize / 2) + j).toFloat() * hexagonCRadius))
-                        j += 1
-                    }
-                }
-                i += 1
+        for (i in boardSize / 2 + 1..boardSize - 1) {
+            for (j in 0..locations.get(i).size() - 1) {
+                locations.get(i).set(j, PointF(x02 + j.toFloat() * 1.5f * hexagonRadius, y02 + (2 * (i - boardSize / 2) + j).toFloat() * hexagonCRadius))
             }
         }
     }
@@ -197,34 +172,26 @@ public class HavannahView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         //draw board
-        run {
-            var i = 0
-            while (i < locations!!.size()) {
-                run {
-                    var j = 0
-                    while (j < locations!!.get(i).size()) {
-                        paint.setStyle(Paint.Style.FILL)
-                        val point = locations!!.get(i).get(j)
-                        val temp = Path()
-                        myMatrix.reset()
-                        myMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                        hexagon!!.transform(myMatrix, temp)
-                        if (i > locations!!.size() / 2) {
-                            val dj = j + i - locations!!.size() / 2
-                            paint.setColor(paletteColors.get(locationColors!![i][dj].toInt()))
-                        } else {
-                            paint.setColor(paletteColors.get(locationColors!![i][j].toInt()))
-                        }
-                        canvas.drawPath(temp, paint)
-                        //draw board outline
-                        paint.setStyle(Paint.Style.STROKE)
-                        paint.setColor(boardOutlineColor)
-                        paint.setStrokeWidth(lineWidth)
-                        canvas.drawPath(temp, paint)
-                        j += 1
-                    }
+        for (i in 0..locations.size() - 1) {
+            for (j in 0..locations.get(i).size() - 1) {
+                paint.setStyle(Paint.Style.FILL)
+                val point = locations.get(i).get(j)
+                val temp = Path()
+                myMatrix.reset()
+                myMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                hexagon!!.transform(myMatrix, temp)
+                if (i > locations.size() / 2) {
+                    val dj = j + i - locations.size() / 2
+                    paint.setColor(paletteColors.get(locationColors!![i][dj].toInt()))
+                } else {
+                    paint.setColor(paletteColors.get(locationColors!![i][j].toInt()))
                 }
-                i += 1
+                canvas.drawPath(temp, paint)
+                //draw board outline
+                paint.setStyle(Paint.Style.STROKE)
+                paint.setColor(boardOutlineColor)
+                paint.setStrokeWidth(lineWidth)
+                canvas.drawPath(temp, paint)
             }
         }
         //draw selectedHex lines
@@ -234,12 +201,12 @@ public class HavannahView : View {
             paint.setStyle(Paint.Style.STROKE)
             paint.setColor(Color.BLACK)
             paint.setStrokeWidth(4.toFloat())
-            val p1i = locations!!.get(x).get(0)
-            val p1f = locations!!.get(x).get(locations!!.get(x).size() - 1)
-            val p2i = locations!!.get(Math.max(0, y - locations!!.size() / 2)).get(y)
-            val nx = Math.min(locations!!.size() - 1, y + locations!!.size() / 2)
-            val ny = Math.max(0, y - locations!!.size() / 2)
-            val p2f = locations!!.get(nx).get(ny)
+            val p1i = locations.get(x).get(0)
+            val p1f = locations.get(x).get(locations.get(x).size() - 1)
+            val p2i = locations.get(Math.max(0, y - locations.size() / 2)).get(y)
+            val nx = Math.min(locations.size() - 1, y + locations.size() / 2)
+            val ny = Math.max(0, y - locations.size() / 2)
+            val p2f = locations.get(nx).get(ny)
             canvas.drawLine(p1i.x, p1i.y, p1f.x, p1f.y, paint)
             canvas.drawLine(p2i.x, p2i.y, p2f.x, p2f.y, paint)
         }
