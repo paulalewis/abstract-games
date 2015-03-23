@@ -5,6 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.castlefrog.agl.domains.havannah.HavannahAction
 import java.util.ArrayList
 import java.util.Vector
 
@@ -37,15 +38,8 @@ public class HavannahView : View {
     private var lineWidth: Float = 0f
 
     private val boardStyle = HexBoardStyle.HEXAGONS
-    private val selectActionListener: SelectActionListener? = null
-
-    public trait SelectActionListener {
-        public fun onActionSelected(x: Int, y: Int)
-    }
-
-    private inner class DummySelectActionListener : SelectActionListener {
-        override fun onActionSelected(x: Int, y: Int) {
-        }
+    private var selectActionListener: SelectActionListener<HavannahAction> = object: SelectActionListener<HavannahAction> {
+        override public fun onActionSelected(action: HavannahAction) {}
     }
 
     public constructor(context: Context) : super(context) {
@@ -137,7 +131,7 @@ public class HavannahView : View {
                     }
                 }
                 MotionEvent.ACTION_UP -> if (selectedHex != null) {
-                    selectActionListener!!.onActionSelected(selectedHex!!.x, selectedHex!!.y)
+                    selectActionListener.onActionSelected(HavannahAction.valueOf(selectedHex!!.x, selectedHex!!.y))
                     selectedHex = null
                     invalidate()
                 }
