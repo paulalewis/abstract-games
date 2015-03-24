@@ -118,20 +118,12 @@ public class HexView : View {
             when (ev.getAction()) {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                     var newSelected: Point? = null
-                    run {
-                        var i = 0
-                        while (i < boardSize) {
-                            run {
-                                var j = 0
-                                while (j < boardSize) {
-                                    val point = locations[i][j]
-                                    if (Math.hypot((point.x - x).toDouble(), (point.y - y).toDouble()) < hexagonCRadius) {
-                                        newSelected = Point(i, j)
-                                    }
-                                    j += 1
-                                }
+                    for (i in 0..boardSize - 1) {
+                        for (j in 0..boardSize - 1) {
+                            val point = locations[i][j]
+                            if (Math.hypot((point.x - x).toDouble(), (point.y - y).toDouble()) < hexagonCRadius) {
+                                newSelected = Point(i, j)
                             }
-                            i += 1
                         }
                     }
                     if (selectedHex == null || selectedHex != newSelected) {
@@ -145,8 +137,9 @@ public class HexView : View {
                     invalidate()
                 }
             }
+            return true
         }
-        return true
+        return false
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
@@ -158,37 +151,29 @@ public class HexView : View {
         contentWidth = width - paddingLeft - paddingRight
         contentHeight = height - paddingTop - paddingBottom
 
-        val maxHexWidth = contentWidth.toFloat() / (0.75.toFloat() * boardSize.toFloat() + 0.25.toFloat())
+        val maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f)
         val maxHexHeight = ((2 * contentHeight) / (3 * boardSize - 1)).toFloat()
         hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
         hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius
-        val boardWidth = hexagonRadius * (1.5.toFloat() * boardSize.toFloat() + 0.5.toFloat())
-        val boardHeight = hexagonCRadius * (3 * boardSize - 1).toFloat()
+        val boardWidth = hexagonRadius * (1.5f * boardSize + 0.5f)
+        val boardHeight = hexagonCRadius * (3 * boardSize - 1)
         val xPadding = (width.toFloat() - boardWidth) / 2
         val yPadding = (height.toFloat() - boardHeight) / 2
-        val yAdjust = hexagonCRadius * (boardSize - 1).toFloat()
+        val yAdjust = hexagonCRadius * (boardSize - 1)
         hexagon = PathUtils.getHexagon(hexagonRadius)
         lineWidth = hexagonRadius * LINE_WIDTH_RATIO
 
         val x0 = xPadding + hexagonRadius
         val y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius)
-        run {
-            var i = 0
-            while (i < boardSize) {
-                run {
-                    var j = 0
-                    while (j < boardSize) {
-                        locations[i][j] = PointF(x0 + i.toFloat() * hexagonRadius * 1.5.toFloat(), y0 - i.toFloat() * hexagonCRadius + j.toFloat() * 2 * hexagonCRadius)
-                        j += 1
-                    }
-                }
-                i += 1
+        for (i in 0..boardSize - 1) {
+            for (j in 0..boardSize - 1) {
+                locations[i][j] = PointF(x0 + i * hexagonRadius * 1.5f, y0 - i * hexagonCRadius + j * 2 * hexagonCRadius)
             }
         }
     }
 
     private fun getCorner(location: PointF, xChange: Int, yChange: Int): PointF {
-        return PointF((location.x + xChange.toFloat() * PathUtils.HEXAGON_HALF_RADIUS * hexagonRadius), (location.y + yChange.toFloat() * PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius))
+        return PointF((location.x + xChange * PathUtils.HEXAGON_HALF_RADIUS * hexagonRadius), (location.y + yChange * PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius))
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -231,23 +216,15 @@ public class HexView : View {
 
         // draw board background
         paint.setStyle(Paint.Style.FILL)
-        run {
-            var i = 0
-            while (i < boardSize) {
-                run {
-                    var j = 0
-                    while (j < boardSize) {
-                        paint.setColor(paletteColors.get(locationColors[i][j].toInt()))
-                        val temp = Path()
-                        val point = locations[i][j]
-                        matrix.reset()
-                        matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                        hexagon!!.transform(matrix, temp)
-                        canvas.drawPath(temp, paint)
-                        j += 1
-                    }
-                }
-                i += 1
+        for (i in 0..boardSize - 1) {
+            for (j in 0..boardSize - 1) {
+                paint.setColor(paletteColors.get(locationColors[i][j].toInt()))
+                val temp = Path()
+                val point = locations[i][j]
+                matrix.reset()
+                matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                hexagon!!.transform(matrix, temp)
+                canvas.drawPath(temp, paint)
             }
         }
         // draw board inner edges
