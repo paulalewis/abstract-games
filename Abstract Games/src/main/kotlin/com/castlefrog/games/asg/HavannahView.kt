@@ -34,10 +34,6 @@ public class HavannahView : View {
 
     private val paint = Paint()
     private val myMatrix = Matrix()
-    private var myPaddingLeft: Int = 0
-    private var myPaddingTop: Int = 0
-    private var myPaddingRight: Int = 0
-    private var myPaddingBottom: Int = 0
     private var contentWidth: Int = 0
     private var contentHeight: Int = 0
     private var lineWidth: Float = 0f
@@ -135,28 +131,37 @@ public class HavannahView : View {
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
-        myPaddingLeft = getPaddingLeft()
-        myPaddingTop = getPaddingTop()
-        myPaddingRight = getPaddingRight()
-        myPaddingBottom = getPaddingBottom()
-        contentWidth = width - myPaddingLeft - myPaddingRight
-        contentHeight = height - myPaddingTop - myPaddingBottom
+        val paddingLeft = getPaddingLeft()
+        val paddingTop = getPaddingTop()
+        val paddingRight = getPaddingRight()
+        val paddingBottom = getPaddingBottom()
+        contentWidth = width - (paddingLeft + paddingRight)
+        contentHeight = height - (paddingTop + paddingBottom)
 
+        // pre-calc for line width
         boardWidth = Math.min(contentWidth, contentHeight).toFloat()
-        boardHeight = boardWidth * (2 * PathUtils.HEXAGON_SHORT_RADIUS * boardSize.toFloat()) / (PathUtils.HEXAGON_RADIUS * (1.5.toFloat() * boardSize.toFloat() + 0.5.toFloat()))
-        hexagonCRadius = boardHeight / (2 * boardSize).toFloat()
+        boardHeight = boardWidth * (2 * PathUtils.HEXAGON_SHORT_RADIUS * boardSize) / (PathUtils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f))
+        hexagonCRadius = boardHeight / (2 * boardSize)
         hexagonRadius = hexagonCRadius / PathUtils.HEXAGON_SHORT_RADIUS
-        hexagon = PathUtils.getHexagon(hexagonRadius)
         lineWidth = hexagonRadius * LINE_WIDTH_RATIO
-        val xPadding = (width.toFloat() - boardWidth) / 2
-        val yPadding = (height.toFloat() - boardHeight) / 2
+
+        // re-calc values with known line width
+        boardWidth = Math.min(contentWidth, contentHeight).toFloat() - lineWidth
+        boardHeight = boardWidth * (2 * PathUtils.HEXAGON_SHORT_RADIUS * boardSize) / (PathUtils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f))
+        hexagonCRadius = boardHeight / (2 * boardSize)
+        hexagonRadius = hexagonCRadius / PathUtils.HEXAGON_SHORT_RADIUS
+
+        hexagon = PathUtils.getHexagon(hexagonRadius)
+
+        val xPadding = paddingLeft + (width - boardWidth) / 2
+        val yPadding = paddingTop + (height - boardHeight) / 2
 
         val x0 = xPadding + boardWidth / 2
         val y0 = yPadding + hexagonCRadius
 
         for (i in 0..boardSize / 2) {
             for (j in 0..locations.get(i).size() - 1) {
-                locations.get(i).set(j, PointF(x0 + (j - i).toFloat() * 1.5f * hexagonRadius, y0 + (i + j).toFloat() * hexagonCRadius))
+                locations.get(i).set(j, PointF(x0 + (j - i) * 1.5f * hexagonRadius, y0 + (i + j) * hexagonCRadius))
             }
         }
 
@@ -164,7 +169,7 @@ public class HavannahView : View {
         val y02 = y0 + (boardSize / 2).toFloat() * hexagonCRadius
         for (i in boardSize / 2 + 1..boardSize - 1) {
             for (j in 0..locations.get(i).size() - 1) {
-                locations.get(i).set(j, PointF(x02 + j.toFloat() * 1.5f * hexagonRadius, y02 + (2 * (i - boardSize / 2) + j).toFloat() * hexagonCRadius))
+                locations.get(i).set(j, PointF(x02 + j * 1.5f * hexagonRadius, y02 + (2 * (i - boardSize / 2) + j) * hexagonCRadius))
             }
         }
     }
@@ -191,6 +196,7 @@ public class HavannahView : View {
                 paint.setStyle(Paint.Style.STROKE)
                 paint.setColor(boardOutlineColor)
                 paint.setStrokeWidth(lineWidth)
+                paint.setStrokeJoin(Paint.Join.ROUND)
                 canvas.drawPath(temp, paint)
             }
         }
