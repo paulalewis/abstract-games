@@ -27,26 +27,47 @@ public class HexView : View {
     private var hexagonCRadius: Float = 0f
     private var lineWidth: Float = 0f
 
-    private var locationColors: Array<ByteArray>? = null
+    private var locationColors: Array<ByteArray> = Array(0, { ByteArray(0) })
     private val paletteColors = ArrayList<Int>()
-    public var myBoardOutlineColor: Int = Color.WHITE
-        private set
+    private var boardOutlineColor: Int = Color.WHITE
     private var lineColor = Color.BLACK
 
-    private var myPaddingLeft: Int = 0
-    private var myPaddingTop: Int = 0
-    private var myPaddingRight: Int = 0
-    private var myPaddingBottom: Int = 0
     private var contentWidth: Int = 0
     private var contentHeight: Int = 0
     private val paint = Paint()
     private val path = Path()
 
-    public var myBoardSize: Int = 0
-        private set
-    private val boardStyle = HexBoardStyle.HEXAGONS
+    public var boardSize: Int = 0
+        set(value) {
+                boardSize = value
+                invalidate()
+        }
+    public var boardBackgroundColor: Int
+        get() = paletteColors.get(BACKGROUND_COLOR_VALUE)
+        set(value) {
+            paletteColors.set(BACKGROUND_COLOR_VALUE, value)
+            invalidate()
+        }
+    public var agent1Color: Int
+        get() = paletteColors.get(AGENT1_COLOR_VALUE)
+        set(value) {
+            paletteColors.set(AGENT1_COLOR_VALUE, value)
+            invalidate()
+        }
+    public var agent2Color: Int
+        get() = paletteColors.get(AGENT2_COLOR_VALUE)
+        set(value) {
+            paletteColors.set(AGENT2_COLOR_VALUE, value)
+            invalidate()
+        }
+    public var connectionColor: Int
+        get() = paletteColors.get(CONNECTION_COLOR_VALUE)
+        set(value) {
+            paletteColors.set(CONNECTION_COLOR_VALUE, connectionColor)
+            invalidate()
+        }
+
     private var selectedHex: Point? = null
-    private val myMatrix = Matrix()
     var selectActionListener: SelectActionListener<HexAction> = DummySelectActionListener()
 
     public constructor(context: Context) : super(context) {
@@ -65,12 +86,12 @@ public class HexView : View {
         // Load attributes
         val a = getContext().obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0)
 
-        myBoardSize = a.getInt(R.styleable.HexView_boardSize, DEFAULT_BOARD_SIZE)
+        boardSize = a.getInt(R.styleable.HexView_boardSize, DEFAULT_BOARD_SIZE)
         val boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, Color.GRAY)
         val agent1Color = a.getColor(R.styleable.HexView_agent1Color, Color.RED)
         val agent2Color = a.getColor(R.styleable.HexView_agent2Color, Color.BLUE)
         val connectionColor = a.getColor(R.styleable.HexView_connectionColor, Color.WHITE)
-        myBoardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, myBoardOutlineColor)
+        boardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, boardOutlineColor)
         lineColor = a.getColor(R.styleable.HexView_lineColor, lineColor)
 
         a.recycle()
@@ -80,14 +101,14 @@ public class HexView : View {
         paletteColors.add(agent2Color)
         paletteColors.add(connectionColor)
 
-        for (i in 1..myBoardSize) {
+        for (i in 1..boardSize) {
             val temp = ArrayList<PointF>()
-            for (j in 1..myBoardSize) {
+            for (j in 1..boardSize) {
                 temp.add(null)
             }
             locations.add(temp)
         }
-        locationColors = Array(myBoardSize, { ByteArray(myBoardSize) })
+        locationColors = Array(boardSize, { ByteArray(boardSize) })
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
@@ -99,11 +120,11 @@ public class HexView : View {
                     var newSelected: Point? = null
                     run {
                         var i = 0
-                        while (i < myBoardSize) {
+                        while (i < boardSize) {
                             run {
                                 var j = 0
-                                while (j < myBoardSize) {
-                                    val point = locations!![i][j]
+                                while (j < boardSize) {
+                                    val point = locations[i][j]
                                     if (Math.hypot((point.x - x).toDouble(), (point.y - y).toDouble()) < hexagonCRadius) {
                                         newSelected = Point(i, j)
                                     }
@@ -130,22 +151,22 @@ public class HexView : View {
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
-        myPaddingLeft = getPaddingLeft()
-        myPaddingTop = getPaddingTop()
-        myPaddingRight = getPaddingRight()
-        myPaddingBottom = getPaddingBottom()
-        contentWidth = width - myPaddingLeft - myPaddingRight
-        contentHeight = height - myPaddingTop - myPaddingBottom
+        val paddingLeft = getPaddingLeft()
+        val paddingTop = getPaddingTop()
+        val paddingRight = getPaddingRight()
+        val paddingBottom = getPaddingBottom()
+        contentWidth = width - paddingLeft - paddingRight
+        contentHeight = height - paddingTop - paddingBottom
 
-        val maxHexWidth = contentWidth.toFloat() / (0.75.toFloat() * myBoardSize.toFloat() + 0.25.toFloat())
-        val maxHexHeight = ((2 * contentHeight) / (3 * myBoardSize - 1)).toFloat()
+        val maxHexWidth = contentWidth.toFloat() / (0.75.toFloat() * boardSize.toFloat() + 0.25.toFloat())
+        val maxHexHeight = ((2 * contentHeight) / (3 * boardSize - 1)).toFloat()
         hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
         hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius
-        val boardWidth = hexagonRadius * (1.5.toFloat() * myBoardSize.toFloat() + 0.5.toFloat())
-        val boardHeight = hexagonCRadius * (3 * myBoardSize - 1).toFloat()
+        val boardWidth = hexagonRadius * (1.5.toFloat() * boardSize.toFloat() + 0.5.toFloat())
+        val boardHeight = hexagonCRadius * (3 * boardSize - 1).toFloat()
         val xPadding = (width.toFloat() - boardWidth) / 2
         val yPadding = (height.toFloat() - boardHeight) / 2
-        val yAdjust = hexagonCRadius * (myBoardSize - 1).toFloat()
+        val yAdjust = hexagonCRadius * (boardSize - 1).toFloat()
         hexagon = PathUtils.getHexagon(hexagonRadius)
         lineWidth = hexagonRadius * LINE_WIDTH_RATIO
 
@@ -153,10 +174,10 @@ public class HexView : View {
         val y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius)
         run {
             var i = 0
-            while (i < myBoardSize) {
+            while (i < boardSize) {
                 run {
                     var j = 0
-                    while (j < myBoardSize) {
+                    while (j < boardSize) {
                         locations[i][j] = PointF(x0 + i.toFloat() * hexagonRadius * 1.5.toFloat(), y0 - i.toFloat() * hexagonCRadius + j.toFloat() * 2 * hexagonCRadius)
                         j += 1
                     }
@@ -172,22 +193,23 @@ public class HexView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        val matrix = Matrix()
         //draw board outer edges
         paint.setStyle(Paint.Style.FILL)
         paint.setStrokeWidth(lineWidth)
         paint.setColor(paletteColors.get(AGENT1_COLOR_VALUE))
-        var p1 = getCorner(locations!![0][0], -2, 0)
-        var p2 = locations!![0][myBoardSize - 1]
+        var p1 = getCorner(locations[0][0], -2, 0)
+        var p2 = locations[0][boardSize - 1]
         canvas.drawRect(p1.x, p1.y, p2.x, p2.y, paint)
-        p1 = getCorner(locations!![myBoardSize - 1][0], 2, 0)
-        p2 = locations!![myBoardSize - 1][myBoardSize - 1]
+        p1 = getCorner(locations[boardSize - 1][0], 2, 0)
+        p2 = locations[boardSize - 1][boardSize - 1]
         canvas.drawRect(p2.x, p1.y, p1.x, p2.y, paint)
 
         paint.setColor(paletteColors.get(AGENT2_COLOR_VALUE))
-        p1 = getCorner(locations!![0][0], -1, -1)
-        p2 = getCorner(locations!![myBoardSize - 1][0], -1, -1)
-        var p3 = locations!![myBoardSize - 1][0]
-        var p4 = locations!![0][0]
+        p1 = getCorner(locations[0][0], -1, -1)
+        p2 = getCorner(locations[boardSize - 1][0], -1, -1)
+        var p3 = locations[boardSize - 1][0]
+        var p4 = locations[0][0]
         path.reset()
         path.moveTo(p1.x, p1.y)
         path.lineTo(p2.x, p2.y)
@@ -195,10 +217,10 @@ public class HexView : View {
         path.lineTo(p4.x, p4.y)
         path.close()
         canvas.drawPath(path, paint)
-        p1 = getCorner(locations!![0][myBoardSize - 1], 1, 1)
-        p2 = getCorner(locations!![myBoardSize - 1][myBoardSize - 1], 1, 1)
-        p3 = locations!![myBoardSize - 1][myBoardSize - 1]
-        p4 = locations!![0][myBoardSize - 1]
+        p1 = getCorner(locations[0][boardSize - 1], 1, 1)
+        p2 = getCorner(locations[boardSize - 1][boardSize - 1], 1, 1)
+        p3 = locations[boardSize - 1][boardSize - 1]
+        p4 = locations[0][boardSize - 1]
         path.reset()
         path.moveTo(p1.x, p1.y)
         path.lineTo(p2.x, p2.y)
@@ -211,16 +233,16 @@ public class HexView : View {
         paint.setStyle(Paint.Style.FILL)
         run {
             var i = 0
-            while (i < myBoardSize) {
+            while (i < boardSize) {
                 run {
                     var j = 0
-                    while (j < myBoardSize) {
-                        paint.setColor(paletteColors.get(locationColors!![i][j].toInt()))
+                    while (j < boardSize) {
+                        paint.setColor(paletteColors.get(locationColors[i][j].toInt()))
                         val temp = Path()
-                        val point = locations!![i][j]
-                        myMatrix.reset()
-                        myMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                        hexagon!!.transform(myMatrix, temp)
+                        val point = locations[i][j]
+                        matrix.reset()
+                        matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                        hexagon!!.transform(matrix, temp)
                         canvas.drawPath(temp, paint)
                         j += 1
                     }
@@ -230,14 +252,14 @@ public class HexView : View {
         }
         // draw board inner edges
         paint.setStyle(Paint.Style.STROKE)
-        paint.setColor(myBoardOutlineColor)
+        paint.setColor(boardOutlineColor)
         //paint.setStrokeWidth(lineWidth);
         for (row in locations!!) {
             for (point in row) {
                 val temp = Path()
-                myMatrix.reset()
-                myMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                hexagon!!.transform(myMatrix, temp)
+                matrix.reset()
+                matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                hexagon!!.transform(matrix, temp)
                 canvas.drawPath(temp, paint)
             }
         }
@@ -248,59 +270,12 @@ public class HexView : View {
             paint.setStyle(Paint.Style.STROKE)
             paint.setColor(lineColor)
             paint.setStrokeWidth(4.toFloat())
-            val p1i = locations!![x][0]
-            val p1f = locations!![x][locations!!.size() - 1]
-            val p2i = locations!![0][y]
-            val p2f = locations!![locations!!.size() - 1][y]
+            val p1i = locations[x][0]
+            val p1f = locations[x][locations.size() - 1]
+            val p2i = locations[0][y]
+            val p2f = locations[locations.size() - 1][y]
             canvas.drawLine(p1i.x, p1i.y, p1f.x, p1f.y, paint)
             canvas.drawLine(p2i.x, p2i.y, p2f.x, p2f.y, paint)
         }
     }
-
-    public fun setBoardSize(boardSize: Int) {
-        this.myBoardSize = boardSize
-        invalidate()
-    }
-
-    public fun getBoardBackgroundColor(): Int {
-        return paletteColors.get(BACKGROUND_COLOR_VALUE)
-    }
-
-    public fun setBoardBackgroundColor(boardBackgroundColor: Int) {
-        paletteColors.set(BACKGROUND_COLOR_VALUE, boardBackgroundColor)
-        invalidate()
-    }
-
-    public fun getAgent1Color(): Int {
-        return paletteColors.get(AGENT1_COLOR_VALUE)
-    }
-
-    public fun setAgent1Color(agent1Color: Int) {
-        paletteColors.set(AGENT1_COLOR_VALUE, agent1Color)
-        invalidate()
-    }
-
-    public fun getAgent2Color(): Int {
-        return paletteColors.get(AGENT2_COLOR_VALUE)
-    }
-
-    public fun setAgent2Color(agent2Color: Int) {
-        paletteColors.set(AGENT2_COLOR_VALUE, agent2Color)
-        invalidate()
-    }
-
-    public fun getConnectionColor(): Int {
-        return paletteColors.get(CONNECTION_COLOR_VALUE)
-    }
-
-    public fun setConnectionColor(connectionColor: Int) {
-        paletteColors.set(CONNECTION_COLOR_VALUE, connectionColor)
-        invalidate()
-    }
-
-    public fun setBoardOutlineColor(boardOutlineColor: Int) {
-        this.myBoardOutlineColor = boardOutlineColor
-        invalidate()
-    }
-
 }
