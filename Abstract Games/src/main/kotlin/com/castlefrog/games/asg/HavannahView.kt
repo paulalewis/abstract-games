@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.castlefrog.agl.domains.havannah.HavannahAction
 import java.util.ArrayList
+import java.util.HashMap
 import java.util.Vector
 
 public class HavannahView : View {
@@ -16,8 +17,8 @@ public class HavannahView : View {
         private val LINE_WIDTH_RATIO = 0.1f
     }
 
-    private var locations: Vector<Vector<PointF>> = Vector()
-    private var hexagon: Path? = null
+    private val locations: Vector<Vector<PointF>> = Vector()
+    private var hexagon: Path = Path()
     /** distance from center to corner  */
     private var hexagonRadius: Float = 0f
     private var hexagonCRadius: Float = 0f
@@ -26,14 +27,12 @@ public class HavannahView : View {
     private var selectedHex: Point? = null
 
     private var boardSize: Int = 0
-    //private Vector<Vector<PointF>> locationsColors;
-    private var locationColors: Array<ByteArray>? = null
-    private val paletteColors = ArrayList<Int>()
+    private var locationColors: Array<ByteArray> = Array(0, { ByteArray(0) })
+    private val paletteColors: MutableMap<Byte, Int> = HashMap()
     private var boardOutlineColor = Color.WHITE
     private var lineColor = Color.BLACK
 
     private val paint = Paint()
-    private val myMatrix = Matrix()
     private var contentWidth: Int = 0
     private var contentHeight: Int = 0
     private var lineWidth: Float = 0f
@@ -66,10 +65,11 @@ public class HavannahView : View {
 
         a.recycle()
 
-        paletteColors.add(boardBackgroundColor)
-        paletteColors.add(agent1Color)
-        paletteColors.add(agent2Color)
-        paletteColors.add(connectionColor)
+        paletteColors.put(0, boardBackgroundColor)
+        paletteColors.put(1, agent1Color)
+        paletteColors.put(2, agent2Color)
+        paletteColors.put(3, lineColor)
+        paletteColors.put(4, connectionColor)
 
         locations.setSize(boardSize)
         val sideLength = (boardSize + 1) / 2
@@ -92,26 +92,18 @@ public class HavannahView : View {
             when (ev.getAction()) {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                     var newSelected: Point? = null
-                    run {
-                        var i = 0
-                        while (i < locations.size()) {
-                            run {
-                                var j = 0
-                                while (j < locations.get(i).size()) {
-                                    val point = locations.get(i).get(j)
-                                    val dx = point.x - x
-                                    val dy = point.y - y
-                                    if (Math.hypot(dx.toDouble(), dy.toDouble()) < hexagonCRadius) {
-                                        var dj = j
-                                        if (i > locations.size() / 2) {
-                                            dj += i - locations.size() / 2
-                                        }
-                                        newSelected = Point(i, dj)
-                                    }
-                                    j += 1
+                    for (i in 0..locations.size() - 1) {
+                        for (j in 0..locations.get(i).size() - 1) {
+                            val point = locations.get(i).get(j)
+                            val dx = point.x - x
+                            val dy = point.y - y
+                            if (Math.hypot(dx.toDouble(), dy.toDouble()) < hexagonCRadius) {
+                                var dj = j
+                                if (i > locations.size() / 2) {
+                                    dj += i - locations.size() / 2
                                 }
+                                newSelected = Point(i, dj)
                             }
-                            i += 1
                         }
                     }
                     if (selectedHex == null || selectedHex != newSelected) {
@@ -125,8 +117,9 @@ public class HavannahView : View {
                     invalidate()
                 }
             }
+            return true
         }
-        return true
+        return false
     }
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
@@ -177,19 +170,20 @@ public class HavannahView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         //draw board
+        val matrix = Matrix()
         for (i in 0..locations.size() - 1) {
             for (j in 0..locations.get(i).size() - 1) {
                 paint.setStyle(Paint.Style.FILL)
                 val point = locations.get(i).get(j)
                 val temp = Path()
-                myMatrix.reset()
-                myMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                hexagon!!.transform(myMatrix, temp)
+                matrix.reset()
+                matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                hexagon.transform(matrix, temp)
                 if (i > locations.size() / 2) {
                     val dj = j + i - locations.size() / 2
-                    paint.setColor(paletteColors.get(locationColors!![i][dj].toInt()))
+                    paint.setColor(paletteColors.get(locationColors[i][dj]) ?: 0)
                 } else {
-                    paint.setColor(paletteColors.get(locationColors!![i][j].toInt()))
+                    paint.setColor(paletteColors.get(locationColors[i][j]) ?: 0)
                 }
                 canvas.drawPath(temp, paint)
                 //draw board outline
