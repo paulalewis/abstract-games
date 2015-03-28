@@ -39,8 +39,8 @@ public class HexView : View {
 
     public var boardSize: Int = 0
         set(value) {
-                boardSize = value
-                invalidate()
+            $boardSize = value
+            invalidate()
         }
     public var boardBackgroundColor: Int
         get() = paletteColors.get(BACKGROUND_COLOR_VALUE)

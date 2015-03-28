@@ -6,10 +6,17 @@
     android:background="@android:color/background_dark"
     tools:context="com.castlefrog.games.asg.GameFragment">
 
-    <com.castlefrog.games.asg.HavannahView
+    <FrameLayout
+        android:id="@+id/gameViewContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        custom:boardSize="5"
-        custom:boardBackgroundColor="@android:color/darker_gray" />
+        android:layout_height="match_parent">
+
+        <com.castlefrog.games.asg.HexGridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            custom:boardSize="5"
+            custom:boardBackgroundColor="@android:color/darker_gray" />
+
+    </FrameLayout>
 
 </FrameLayout>
