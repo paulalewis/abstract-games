@@ -2,6 +2,7 @@ package com.castlefrog.games.asg
 
 import android.app.Fragment
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -24,8 +25,14 @@ class SelectGameTypeFragment : Fragment() {
 
     override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
-        contents.add(Pair<String, View>(getString(R.string.hex), HexView(getActivity())))
-        contents.add(Pair<String, View>(getString(R.string.havannah), HavannahView(getActivity())))
+        val hexIconView = HexGridView(getActivity())
+        hexIconView.boardSize = 3
+        hexIconView.boardBackgroundColor = Color.GRAY
+        contents.add(Pair<String, View>(getString(R.string.hex), hexIconView))
+        val havannahIconView = HexGridView(getActivity())
+        havannahIconView.boardSize = 3
+        havannahIconView.boardBackgroundColor = Color.GRAY
+        contents.add(Pair<String, View>(getString(R.string.havannah), havannahIconView))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View {

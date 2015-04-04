@@ -68,7 +68,7 @@ public class HexView : View {
         }
 
     private var selectedHex: Point? = null
-    var selectActionListener: SelectActionListener<HexAction> = DummySelectActionListener()
+    //var selectActionListener: SelectActionListener<HexAction> = DummySelectActionListener()
 
     public constructor(context: Context) : super(context) {
         init(null, 0)
@@ -132,7 +132,7 @@ public class HexView : View {
                     }
                 }
                 MotionEvent.ACTION_UP -> if (selectedHex != null) {
-                    selectActionListener.onActionSelected(HexAction.valueOf(selectedHex!!.x, selectedHex!!.y))
+                    //selectActionListener.onActionSelected(HexAction.valueOf(selectedHex!!.x, selectedHex!!.y))
                     selectedHex = null
                     invalidate()
                 }

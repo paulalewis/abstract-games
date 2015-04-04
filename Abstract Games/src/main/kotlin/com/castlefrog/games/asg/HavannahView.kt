@@ -37,7 +37,7 @@ public class HavannahView : View {
     private var contentHeight: Int = 0
     private var lineWidth: Float = 0f
 
-    public var selectActionListener: SelectActionListener<HavannahAction> = DummySelectActionListener()
+    //public var selectActionListener: SelectActionListener<HavannahAction> = DummySelectActionListener()
 
     public constructor(context: Context) : super(context) {
         init(null, 0)
@@ -112,7 +112,7 @@ public class HavannahView : View {
                     }
                 }
                 MotionEvent.ACTION_UP -> if (selectedHex != null) {
-                    selectActionListener.onActionSelected(HavannahAction.valueOf(selectedHex!!.x, selectedHex!!.y))
+                    //selectActionListener.onActionSelected(HavannahAction.valueOf(selectedHex!!.x, selectedHex!!.y))
                     selectedHex = null
                     invalidate()
                 }

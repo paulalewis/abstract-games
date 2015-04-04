@@ -16,6 +16,8 @@ public class HexGridView : View {
     companion object {
         private val MIN_BOARD_SIZE = 1
         private val DEFAULT_LINE_WIDTH_RATIO = 0.1f
+        private val DEFAULT_OUTLINE_COLOR = Color.WHITE
+        private val DEFAULT_BACKGROUND_COLOR = Color.GRAY
     }
 
     /**
@@ -36,7 +38,7 @@ public class HexGridView : View {
     public var boardSize: Int = MIN_BOARD_SIZE
         set(value) {
             if (boardSize != value) {
-                $boardSize = if (value > 0) value else MIN_BOARD_SIZE
+                $boardSize = Math.max(MIN_BOARD_SIZE, value)
                 locations.clear()
                 for (i in 1..boardSize) {
                     val temp = ArrayList<PointF>()
@@ -57,12 +59,12 @@ public class HexGridView : View {
             invalidate()
         }
 
-    public var hexTouchListener: HexTouchListener = DummyHexTouchListener()
+    public var locationColors: Array<ByteArray> = Array(boardSize, { ByteArray(boardSize) })
+    public val paletteColors: MutableMap<Byte, Int> = HashMap()
+    public var boardOutlineColor: Int = DEFAULT_OUTLINE_COLOR
+    public var boardBackgroundColor: Int = DEFAULT_BACKGROUND_COLOR
 
-    private var locationColors: Array<ByteArray> = Array(0, { ByteArray(0) })
-    private val paletteColors: MutableMap<Byte, Int> = HashMap()
-    private var boardOutlineColor = Color.WHITE
-    private var lineColor = Color.BLACK
+    public var hexTouchListener: HexTouchListener = DummyHexTouchListener()
 
     private val locations: MutableList<List<PointF>> = ArrayList()
     private var hexagon = Path()
@@ -86,24 +88,13 @@ public class HexGridView : View {
     }
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
-        // Load attributes
         val a = getContext().obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0)
 
         boardSize = a.getInt(R.styleable.HexView_boardSize, boardSize)
-        val boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, Color.GRAY)
-        val agent1Color = a.getColor(R.styleable.HexView_agent1Color, Color.RED)
-        val agent2Color = a.getColor(R.styleable.HexView_agent2Color, Color.BLUE)
-        val connectionColor = a.getColor(R.styleable.HexView_connectionColor, Color.WHITE)
+        boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, boardBackgroundColor)
         boardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, boardOutlineColor)
-        lineColor = a.getColor(R.styleable.HexView_lineColor, lineColor)
 
         a.recycle()
-
-        paletteColors.put(0, boardBackgroundColor)
-        paletteColors.put(1, agent1Color)
-        paletteColors.put(2, agent2Color)
-        paletteColors.put(3, lineColor)
-        paletteColors.put(4, connectionColor)
     }
 
     override fun onTouchEvent(mv: MotionEvent): Boolean {
@@ -163,7 +154,7 @@ public class HexGridView : View {
         paint.setStyle(Paint.Style.FILL)
         for (i in 0..boardSize - 1) {
             for (j in 0..boardSize - 1) {
-                paint.setColor(paletteColors.get(locationColors[i][j].toInt()) ?: 0)
+                paint.setColor(paletteColors.get(locationColors[i][j].toInt()) ?: boardBackgroundColor)
                 val temp = Path()
                 val point = locations[i][j]
                 matrix.reset()
