@@ -124,20 +124,26 @@ public class HexGridView : View {
         val contentWidth = width - paddingLeft - paddingRight
         val contentHeight = height - paddingTop - paddingBottom
 
-        val maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f)
-        val maxHexHeight = ((2 * contentHeight) / (3 * boardSize - 1)).toFloat()
+        // pre-calc line width
+        var maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f)
+        var maxHexHeight = ((2 * contentHeight) / (3 * boardSize - 1)).toFloat()
         hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
-        hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius
-        val boardWidth = hexagonRadius * (1.5f * boardSize + 0.5f)
-        val boardHeight = hexagonCRadius * (3 * boardSize - 1)
-        val xPadding = (width.toFloat() - boardWidth) / 2
-        val yPadding = (height.toFloat() - boardHeight) / 2
-        val yAdjust = hexagonCRadius * (boardSize - 1)
-        hexagon = PathUtils.getHexagon(hexagonRadius)
         lineWidth = hexagonRadius * lineWidthRatio
 
+        maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f)
+        maxHexHeight = (2 * (contentHeight - lineWidth)) / (3 * boardSize - 1)
+        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
+
+        hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius
+        hexagon = PathUtils.getHexagon(hexagonRadius)
+        val boardWidth = hexagonRadius * (1.5f * boardSize + 0.5f)
+        val boardHeight = hexagonCRadius * (3 * boardSize - 1)
+        val xPadding = (width - boardWidth) / 2
+        val yPadding = (height - boardHeight) / 2
+        val yAdjust = hexagonCRadius * (boardSize - 1)
+
         val x0 = xPadding + hexagonRadius
-        val y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius)
+        val y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius) - 1.5f * lineWidth
         for (i in 0..boardSize - 1) {
             for (j in 0..boardSize - 1) {
                 locations[i][j].x = x0 + i * hexagonRadius * 1.5f
