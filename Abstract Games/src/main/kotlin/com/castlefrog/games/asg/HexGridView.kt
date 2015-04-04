@@ -142,7 +142,6 @@ public class HexGridView : View {
             for (j in 0..boardSize - 1) {
                 locations[i][j].x = x0 + i * hexagonRadius * 1.5f
                 locations[i][j].y = y0 - i * hexagonCRadius + j * 2 * hexagonCRadius
-                //locations[i][j] = PointF(x0 + i * hexagonRadius * 1.5f, y0 - i * hexagonCRadius + j * 2 * hexagonCRadius)
             }
         }
     }
