@@ -94,6 +94,7 @@
     <orderEntry type="library" exported="" name="agl" level="project" />
     <orderEntry type="library" exported="" name="kotlin-stdlib-0.12.213" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.0.0" level="project" />
+    <orderEntry type="library" exported="" name="anko-0.5-15" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="kotlin-runtime-0.12.213" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.0.0" level="project" />
