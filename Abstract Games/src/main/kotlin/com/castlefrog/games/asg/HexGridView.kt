@@ -23,7 +23,7 @@ public class HexGridView : View {
     /**
      * Get a touch event on a specific hex
      */
-    public trait HexTouchListener {
+    public interface HexTouchListener {
         public fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent)
     }
 

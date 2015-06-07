@@ -14,7 +14,7 @@ import java.util.ArrayList
  */
 class SelectGameTypeAdapter(val contents: List<Pair<String, View>>, val onItemClickListener: SelectGameTypeAdapter.OnItemClickListener) : RecyclerView.Adapter<SelectGameTypeAdapter.ViewHolder>() {
 
-    trait OnItemClickListener {
+    interface OnItemClickListener {
         fun onItemClick(position: Int)
     }
 
