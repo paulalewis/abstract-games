@@ -27,19 +27,14 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:recyclerview-v7:22.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-}
+    compile 'com.android.support:design:22.2.0'
+    compile 'com.google.dagger:dagger:2.0.1'
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:0.12.213'
+    compile 'org.jetbrains.anko:anko:0.6.2-15'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.caverock:androidsvg:1.2.1'
 
-buildscript {
-    ext.kotlin_version = '0.12.213'
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-repositories {
-    compile 'org.jetbrains.anko:anko:0.5-15'
+    testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
 }
