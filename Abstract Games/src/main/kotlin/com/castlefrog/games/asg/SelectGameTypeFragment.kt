@@ -42,16 +42,7 @@ class SelectGameTypeFragment : DialogFragment() {
         recyclerView?.setLayoutManager(GridLayoutManager(getActivity(), 3))
         recyclerView?.setAdapter(SelectGameTypeAdapter(contents, object: SelectGameTypeAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                val fragment = GameFragment.newInstance(contents.get(position).first)
-                getFragmentManager().addOnBackStackChangedListener({
-                    if (getFragmentManager().getBackStackEntryCount() == 0) {
-                        getActivity().getActionBar().setTitle(R.string.app_name)
-                    }
-                })
-                getFragmentManager().beginTransaction()
-                        .add(R.id.container, fragment, null)
-                        .addToBackStack(null)
-                        .commit()
+                GameActivity.navigate(this@SelectGameTypeFragment.getActivity(), contents.get(position).first)
             }
         }))
         return view;
