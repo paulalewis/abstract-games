@@ -1,5 +1,6 @@
 package com.castlefrog.games.asg
 
+import android.app.DialogFragment
 import android.app.Fragment
 import android.content.Intent
 import android.graphics.Color
@@ -15,7 +16,7 @@ import java.util.ArrayList
 /**
  * Fragment for selected the game type.
  */
-class SelectGameTypeFragment : Fragment() {
+class SelectGameTypeFragment : DialogFragment() {
     private var recyclerView: RecyclerView? = null
     private val contents: MutableList<Pair<String, View>>
 
@@ -35,7 +36,7 @@ class SelectGameTypeFragment : Fragment() {
         contents.add(Pair<String, View>(getString(R.string.havannah), havannahIconView))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         var view = inflater.inflate(R.layout.fragment_select_game_type, container, false)
         recyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
         recyclerView?.setLayoutManager(GridLayoutManager(getActivity(), 3))
