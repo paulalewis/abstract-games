@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.PictureDrawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -16,14 +18,13 @@ public class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val add = findViewById(R.id.add) as FloatingActionButton;
+        val add = findViewById(R.id.add) as FloatingActionButton
         add.setImageSvg(R.raw.ic_add)
         add.setOnClickListener {
-            //val fragmentTransaction = getFragmentManager().beginTransaction()
-            //fragmentTransaction.replace(R.id.container, SelectGameTypeFragment())
-            //fragmentTransaction.commit()
             SelectGameTypeFragment().show(getFragmentManager(), null)
         }
+        val gameList = findViewById(R.id.gameList) as RecyclerView
+        gameList.setLayoutManager(LinearLayoutManager(this))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -41,7 +42,7 @@ public class MainActivity : Activity() {
 
     fun ImageView.setImageSvg(resId: Int) {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        val svg = SVG.getFromResource(getResources(), resId);
-        setImageDrawable(PictureDrawable(svg.renderToPicture()));
+        val svg = SVG.getFromResource(getResources(), resId)
+        setImageDrawable(PictureDrawable(svg.renderToPicture()))
     }
 }

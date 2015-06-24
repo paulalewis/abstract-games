@@ -11,7 +11,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import java.util.ArrayList
+import com.castlefrog.games.asg.model.Domain
+import com.castlefrog.games.asg.model.Game
+import java.util.*
 
 /**
  * Fragment for selected the game type.
@@ -42,7 +44,9 @@ class SelectGameTypeFragment : DialogFragment() {
         recyclerView?.setLayoutManager(GridLayoutManager(getActivity(), 3))
         recyclerView?.setAdapter(SelectGameTypeAdapter(contents, object: SelectGameTypeAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                GameActivity.navigate(this@SelectGameTypeFragment.getActivity(), contents.get(position).first)
+                val domain = Domain(contents.get(position).first)
+                val game = Game("default", domain, 0)
+                GameActivity.navigate(getActivity(), game)
             }
         }))
         return view;

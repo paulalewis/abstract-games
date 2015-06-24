@@ -8,6 +8,13 @@ import android.os.Bundle
 import android.view.*
 import com.castlefrog.agl.Agent
 import com.castlefrog.agl.Arbiter
+import com.castlefrog.agl.TurnType
+import com.castlefrog.agl.agents.ExternalAgent
+import com.castlefrog.agl.agents.RandomAgent
+import com.castlefrog.agl.domains.hex.HexAction
+import com.castlefrog.agl.domains.hex.HexSimulator
+import com.castlefrog.agl.domains.hex.HexState
+import java.util.*
 import java.util.concurrent.Executors
 
 public class GameFragment : Fragment() {
@@ -24,9 +31,8 @@ public class GameFragment : Fragment() {
         }
     }
 
-    private val executor = Executors.newSingleThreadExecutor()
-    private val arbiter: Arbiter<*, *>? = null
-    private val agents: List<Agent>? = null
+    private var arbiter: Arbiter<*, *>? = null
+    private val agents: MutableList<Agent> = ArrayList()
     private var gameType = ""
     private var helpUri: Uri? = null
 
@@ -37,6 +43,20 @@ public class GameFragment : Fragment() {
         val resId = getResources().getIdentifier("help_uri_" + gameType.toLowerCase(), "string", getActivity().getPackageName())
         helpUri = Uri.parse(getString(resId))
         setHasOptionsMenu(true)
+
+        // TODO - dynamically set agents
+        agents.add(RandomAgent())
+        agents.add(ExternalAgent())
+
+        /*val simulator = HexSimulator.create(8, TurnType.SEQUENTIAL)
+        arbiter = Arbiter<HexState, HexAction>(simulator.getState(), simulator, agents)
+        arbiter?.setOnStateChangeListener(Arbiter.OnEventListener(){
+            // TODO - go to next step
+            if (arbiter?.getWorld()?.isTerminalState() == false) {
+                arbiter?.step()
+            }
+        })
+        arbiter?.step()*/
     }
 
     override fun onResume() {
@@ -49,14 +69,12 @@ public class GameFragment : Fragment() {
         return view
     }
 
-    override public fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.game, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
     override public fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.getItemId()) {
-            R.id.action_settings -> {
+            R.id.action_undo_move -> {
+                true
+            }
+            R.id.action_redo_move -> {
                 true
             }
             R.id.action_about -> {
