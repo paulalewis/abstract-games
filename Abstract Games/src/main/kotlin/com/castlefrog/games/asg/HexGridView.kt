@@ -5,6 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.castlefrog.agl.Arbiter
 import com.castlefrog.agl.domains.havannah.HavannahAction
 import java.util.ArrayList
 import java.util.Collections
@@ -181,5 +182,9 @@ public class HexGridView : View {
                 canvas.drawPath(temp, paint)
             }
         }
+    }
+
+    public fun setOnHexTouchListener(listener: HexTouchListener) {
+        hexTouchListener = listener
     }
 }

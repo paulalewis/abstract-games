@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.castlefrog.games.asg.model.Domain
 import java.util.ArrayList
 
 /**
  */
-class SelectGameTypeAdapter(val contents: List<Pair<String, View>>, val onItemClickListener: SelectGameTypeAdapter.OnItemClickListener) : RecyclerView.Adapter<SelectGameTypeAdapter.ViewHolder>() {
+class SelectGameTypeAdapter(val contents: List<Pair<Domain, View>>, val onItemClickListener: SelectGameTypeAdapter.OnItemClickListener) : RecyclerView.Adapter<SelectGameTypeAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemClick(position: Int)
@@ -40,7 +41,8 @@ class SelectGameTypeAdapter(val contents: List<Pair<String, View>>, val onItemCl
     }
 
     override public fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        viewHolder.gameText.setText(contents.get(position).first)
+        val domainName = viewHolder.itemView.getResources().getString(contents.get(position).first.type.nameRes)
+        viewHolder.gameText.setText(domainName)
         viewHolder.gameIcon.addView(contents.get(position).second)
     }
 

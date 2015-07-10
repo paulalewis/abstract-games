@@ -8,14 +8,6 @@
     <FrameLayout
         android:id="@+id/gameViewContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.castlefrog.games.asg.HexGridView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            custom:boardSize="5"
-            custom:boardBackgroundColor="@android:color/darker_gray" />
-
-    </FrameLayout>
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

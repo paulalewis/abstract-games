@@ -24,7 +24,7 @@ public class GameActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
         val game : Game = getIntent().getExtras().getSerializable(ARG_GAME) as Game
-        val fragment = GameFragment.newInstance(game.domain.name)
+        val fragment = GameFragment.newInstance(game)
         getFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment, null)
                 .commit()

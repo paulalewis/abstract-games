@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.castlefrog.games.asg.model.Domain
+import com.castlefrog.games.asg.model.DomainType
 import com.castlefrog.games.asg.model.Game
 import java.util.*
 
@@ -20,10 +21,10 @@ import java.util.*
  */
 class SelectGameTypeFragment : DialogFragment() {
     private var recyclerView: RecyclerView? = null
-    private val contents: MutableList<Pair<String, View>>
+    private val contents: MutableList<Pair<Domain, View>>
 
     init {
-        contents = ArrayList<Pair<String, View>>()
+        contents = ArrayList<Pair<Domain, View>>()
     }
 
     override fun onCreate(bundle: Bundle?) {
@@ -31,11 +32,11 @@ class SelectGameTypeFragment : DialogFragment() {
         val hexIconView = HexGridView(getActivity())
         hexIconView.boardSize = 3
         hexIconView.boardBackgroundColor = Color.GRAY
-        contents.add(Pair<String, View>(getString(R.string.hex), hexIconView))
+        contents.add(Pair<Domain, View>(Domain(DomainType.HEX), hexIconView))
         val havannahIconView = HexGridView(getActivity())
         havannahIconView.boardSize = 3
         havannahIconView.boardBackgroundColor = Color.GRAY
-        contents.add(Pair<String, View>(getString(R.string.havannah), havannahIconView))
+        contents.add(Pair<Domain, View>(Domain(DomainType.HAVANNAH), havannahIconView))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -44,7 +45,7 @@ class SelectGameTypeFragment : DialogFragment() {
         recyclerView?.setLayoutManager(GridLayoutManager(getActivity(), 3))
         recyclerView?.setAdapter(SelectGameTypeAdapter(contents, object: SelectGameTypeAdapter.OnItemClickListener {
             override fun onItemClick(position: Int) {
-                val domain = Domain(contents.get(position).first)
+                val domain = contents.get(position).first
                 val game = Game("default", domain, 0)
                 GameActivity.navigate(getActivity(), game)
             }
