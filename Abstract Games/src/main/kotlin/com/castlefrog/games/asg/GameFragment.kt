@@ -99,11 +99,12 @@ public class GameFragment : Fragment() {
                 for (i in 0..arbiter!!.getWorld().getNAgents() - 1) {
                     if (arbiter!!.getWorld().hasLegalActions(i)) {
                         val action = HexAction.valueOf(x, y)
-                        if (arbiter!!.getWorld().getLegalActions().contains(action)) {
+                        if (arbiter!!.getWorld().getLegalActions(i).contains(action)) {
                             val agent = agents.get(i) as ExternalAgent
                             agent.setAction(action)
-                            hexView?.locationColors!!.get(x).set(y, (i + 1).toByte())
+                            hexView!!.setLocationColor(x, y, i + 1)
                         }
+                        break
                     }
                 }
             }

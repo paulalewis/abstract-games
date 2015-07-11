@@ -160,7 +160,7 @@ public class HexGridView : View {
         paint.setStyle(Paint.Style.FILL)
         for (i in 0..boardSize - 1) {
             for (j in 0..boardSize - 1) {
-                paint.setColor(paletteColors.get(locationColors[i][j].toInt()) ?: boardBackgroundColor)
+                paint.setColor(paletteColors.get(locationColors[i][j]) ?: boardBackgroundColor)
                 val temp = Path()
                 val point = locations[i][j]
                 matrix.reset()
@@ -186,5 +186,10 @@ public class HexGridView : View {
 
     public fun setOnHexTouchListener(listener: HexTouchListener) {
         hexTouchListener = listener
+    }
+
+    public fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
+        locationColors.get(x).set(y, colorIndex.toByte())
+        invalidate()
     }
 }
