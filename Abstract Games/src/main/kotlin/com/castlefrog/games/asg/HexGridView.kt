@@ -39,7 +39,7 @@ public class HexGridView : View {
     public var boardSize: Int = MIN_BOARD_SIZE
         set(value) {
             if (boardSize != value) {
-                $boardSize = Math.max(MIN_BOARD_SIZE, value)
+                field = Math.max(MIN_BOARD_SIZE, value)
                 locations.clear()
                 for (i in 1..boardSize) {
                     val temp = ArrayList<PointF>()

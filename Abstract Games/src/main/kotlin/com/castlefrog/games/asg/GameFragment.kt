@@ -58,6 +58,9 @@ public class GameFragment : Fragment() {
 
         arbiter = createArbiter(game?.domain!!)
         arbiter!!.setOnStateChangeListener(Arbiter.OnEventListener() {
+            // update board view
+            val state = arbiter!!.getWorld().getState() as HexState;
+            //hexView!!.setLocationColor()
             // TODO - go to next step
             if (arbiter!!.getWorld()?.isTerminalState() == false) {
                 arbiter!!.stepAsync()
@@ -96,15 +99,19 @@ public class GameFragment : Fragment() {
         hexView?.paletteColors?.put(2, Color.BLUE)
         hexView?.setOnHexTouchListener(object : HexGridView.HexTouchListener {
             override fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent) {
-                for (i in 0..arbiter!!.getWorld().getNAgents() - 1) {
-                    if (arbiter!!.getWorld().hasLegalActions(i)) {
-                        val action = HexAction.valueOf(x, y)
-                        if (arbiter!!.getWorld().getLegalActions(i).contains(action)) {
-                            val agent = agents.get(i) as ExternalAgent
-                            agent.setAction(action)
-                            hexView!!.setLocationColor(x, y, i + 1)
+                when (mv.getAction()) {
+                    MotionEvent.ACTION_UP -> {
+                        for (i in 0..arbiter!!.getWorld().getNAgents() - 1) {
+                            if (arbiter!!.getWorld().hasLegalActions(i)) {
+                                val action = HexAction.valueOf(x, y)
+                                if (arbiter!!.getWorld().getLegalActions(i).contains(action)) {
+                                    val agent = agents.get(i) as ExternalAgent
+                                    agent.setAction(action)
+                                    hexView!!.setLocationColor(x, y, i + 1)
+                                }
+                                break
+                            }
                         }
-                        break
                     }
                 }
             }
