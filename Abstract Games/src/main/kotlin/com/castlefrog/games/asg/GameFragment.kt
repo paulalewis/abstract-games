@@ -46,9 +46,9 @@ public class GameFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bundle = savedInstanceState ?: getArguments()
+        val bundle = savedInstanceState ?: arguments
         game = bundle.getSerializable(ARG_GAME) as Game
-        val resId = getResources().getIdentifier("help_uri_" + game?.domain?.type?.name()?.toLowerCase(), "string", getActivity().getPackageName())
+        val resId = resources.getIdentifier("help_uri_" + game?.domain?.type?.name()?.toLowerCase(), "string", activity.packageName)
         helpUri = Uri.parse(getString(resId))
         setHasOptionsMenu(true)
 
@@ -73,18 +73,18 @@ public class GameFragment : Fragment() {
         when (domain.type) {
             DomainType.HEX -> {
                 val simulator = HexSimulator.create(8, TurnType.SEQUENTIAL)
-                return Arbiter(simulator.getState(), simulator, agents)
+                return Arbiter(simulator.state, simulator, agents)
             }
             DomainType.HAVANNAH -> {
-                val simulator = HavannahSimulator.create(5, TurnType.SEQUENTIAL);
-                return Arbiter(simulator.getState(), simulator, agents)
+                val simulator = HavannahSimulator.create(5, TurnType.SEQUENTIAL)
+                return Arbiter(simulator.state, simulator, agents)
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        getActivity().getActionBar().setTitle(getResources().getString(game?.domain?.type?.nameRes!!))
+        activity.actionBar.title = resources.getString(game?.domain?.type?.nameRes!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -92,14 +92,14 @@ public class GameFragment : Fragment() {
         val gameViewContainer = view.findViewById(R.id.gameViewContainer) as FrameLayout
 
         // TODO - change look base on game
-        hexView = HexGridView(getActivity())
+        hexView = HexGridView(activity)
         hexView?.boardSize = 5
-        hexView?.boardBackgroundColor = getResources().getColor(android.R.color.darker_gray)
+        hexView?.boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
         hexView?.paletteColors?.put(1, Color.RED)
         hexView?.paletteColors?.put(2, Color.BLUE)
         hexView?.setOnHexTouchListener(object : HexGridView.HexTouchListener {
             override fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent) {
-                when (mv.getAction()) {
+                when (mv.action) {
                     MotionEvent.ACTION_UP -> {
                         for (i in 0..arbiter!!.getWorld().getNAgents() - 1) {
                             if (arbiter!!.getWorld().hasLegalActions(i)) {
@@ -122,7 +122,7 @@ public class GameFragment : Fragment() {
     }
 
     override public fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.getItemId()) {
+        return when (item.itemId) {
             R.id.action_undo_move -> {
                 true
             }

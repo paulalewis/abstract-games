@@ -1,7 +1,6 @@
 package com.castlefrog.games.asg
 
 import android.app.Activity
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.PictureDrawable
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -21,19 +20,19 @@ public class MainActivity : Activity() {
         val add = findViewById(R.id.add) as FloatingActionButton
         add.setImageSvg(R.raw.ic_add)
         add.setOnClickListener {
-            SelectGameTypeFragment().show(getFragmentManager(), null)
+            SelectGameTypeFragment().show(fragmentManager, null)
         }
         val gameList = findViewById(R.id.gameList) as RecyclerView
-        gameList.setLayoutManager(LinearLayoutManager(this))
+        gameList.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        getMenuInflater().inflate(R.menu.main, menu)
+        menuInflater.inflate(R.menu.main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
+        val id = item.itemId
         if (id == R.id.action_settings) {
             return true
         }
@@ -42,7 +41,7 @@ public class MainActivity : Activity() {
 
     fun ImageView.setImageSvg(resId: Int) {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        val svg = SVG.getFromResource(getResources(), resId)
+        val svg = SVG.getFromResource(resources, resId)
         setImageDrawable(PictureDrawable(svg.renderToPicture()))
     }
 }

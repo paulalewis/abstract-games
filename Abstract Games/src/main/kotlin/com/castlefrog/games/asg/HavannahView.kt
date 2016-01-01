@@ -53,7 +53,7 @@ public class HavannahView : View {
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
         // Load attributes
-        val a = getContext().obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0)
+        val a = context.obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0)
 
         boardSize = a.getInt(R.styleable.HexView_boardSize, DEFAULT_BOARD_SIZE)
         val boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, Color.GRAY)
@@ -86,21 +86,21 @@ public class HavannahView : View {
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        if (isEnabled()) {
-            val x = ev.getX()
-            val y = ev.getY()
-            when (ev.getAction()) {
+        if (isEnabled) {
+            val x = ev.x
+            val y = ev.y
+            when (ev.action) {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
                     var newSelected: Point? = null
-                    for (i in 0..locations.size() - 1) {
-                        for (j in 0..locations.get(i).size() - 1) {
-                            val point = locations.get(i).get(j)
+                    for (i in 0..locations.size - 1) {
+                        for (j in 0..locations[i].size - 1) {
+                            val point = locations[i][j]
                             val dx = point.x - x
                             val dy = point.y - y
                             if (Math.hypot(dx.toDouble(), dy.toDouble()) < hexagonCRadius) {
                                 var dj = j
-                                if (i > locations.size() / 2) {
-                                    dj += i - locations.size() / 2
+                                if (i > locations.size / 2) {
+                                    dj += i - locations.size / 2
                                 }
                                 newSelected = Point(i, dj)
                             }
@@ -124,10 +124,6 @@ public class HavannahView : View {
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
-        val paddingLeft = getPaddingLeft()
-        val paddingTop = getPaddingTop()
-        val paddingRight = getPaddingRight()
-        val paddingBottom = getPaddingBottom()
         contentWidth = width - (paddingLeft + paddingRight)
         contentHeight = height - (paddingTop + paddingBottom)
 
@@ -153,16 +149,16 @@ public class HavannahView : View {
         val y0 = yPadding + hexagonCRadius
 
         for (i in 0..boardSize / 2) {
-            for (j in 0..locations.get(i).size() - 1) {
-                locations.get(i).set(j, PointF(x0 + (j - i) * 1.5f * hexagonRadius, y0 + (i + j) * hexagonCRadius))
+            for (j in 0..locations[i].size - 1) {
+                locations[i][j] = PointF(x0 + (j - i) * 1.5f * hexagonRadius, y0 + (i + j) * hexagonCRadius)
             }
         }
 
         val x02 = x0 - (boardSize / 2).toFloat() * hexagonRadius * 3 / 2
         val y02 = y0 + (boardSize / 2).toFloat() * hexagonCRadius
         for (i in boardSize / 2 + 1..boardSize - 1) {
-            for (j in 0..locations.get(i).size() - 1) {
-                locations.get(i).set(j, PointF(x02 + j * 1.5f * hexagonRadius, y02 + (2 * (i - boardSize / 2) + j) * hexagonCRadius))
+            for (j in 0..locations[i].size - 1) {
+                locations[i][j] = PointF(x02 + j * 1.5f * hexagonRadius, y02 + (2 * (i - boardSize / 2) + j) * hexagonCRadius)
             }
         }
     }
@@ -171,26 +167,26 @@ public class HavannahView : View {
         super.onDraw(canvas)
         //draw board
         val matrix = Matrix()
-        for (i in 0..locations.size() - 1) {
-            for (j in 0..locations.get(i).size() - 1) {
-                paint.setStyle(Paint.Style.FILL)
-                val point = locations.get(i).get(j)
+        for (i in 0..locations.size - 1) {
+            for (j in 0..locations[i].size - 1) {
+                paint.style = Paint.Style.FILL
+                val point = locations[i][j]
                 val temp = Path()
                 matrix.reset()
                 matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
                 hexagon.transform(matrix, temp)
-                if (i > locations.size() / 2) {
-                    val dj = j + i - locations.size() / 2
-                    paint.setColor(paletteColors.get(locationColors[i][dj]) ?: 0)
+                if (i > locations.size / 2) {
+                    val dj = j + i - locations.size / 2
+                    paint.color = paletteColors[locationColors[i][dj]] ?: 0
                 } else {
-                    paint.setColor(paletteColors.get(locationColors[i][j]) ?: 0)
+                    paint.color = paletteColors[locationColors[i][j]] ?: 0
                 }
                 canvas.drawPath(temp, paint)
                 //draw board outline
-                paint.setStyle(Paint.Style.STROKE)
-                paint.setColor(boardOutlineColor)
-                paint.setStrokeWidth(lineWidth)
-                paint.setStrokeJoin(Paint.Join.ROUND)
+                paint.style = Paint.Style.STROKE
+                paint.color = boardOutlineColor
+                paint.strokeWidth = lineWidth
+                paint.strokeJoin = Paint.Join.ROUND
                 canvas.drawPath(temp, paint)
             }
         }
@@ -198,15 +194,15 @@ public class HavannahView : View {
         if (selectedHex != null) {
             val y = selectedHex!!.x
             val x = selectedHex!!.y
-            paint.setStyle(Paint.Style.STROKE)
-            paint.setColor(Color.BLACK)
-            paint.setStrokeWidth(4.toFloat())
-            val p1i = locations.get(x).get(0)
-            val p1f = locations.get(x).get(locations.get(x).size() - 1)
-            val p2i = locations.get(Math.max(0, y - locations.size() / 2)).get(y)
-            val nx = Math.min(locations.size() - 1, y + locations.size() / 2)
-            val ny = Math.max(0, y - locations.size() / 2)
-            val p2f = locations.get(nx).get(ny)
+            paint.style = Paint.Style.STROKE
+            paint.color = Color.BLACK
+            paint.strokeWidth = 4f
+            val p1i = locations[x][0]
+            val p1f = locations[x][locations[x].size - 1]
+            val p2i = locations[Math.max(0, y - locations.size / 2)][y]
+            val nx = Math.min(locations.size - 1, y + locations.size / 2)
+            val ny = Math.max(0, y - locations.size / 2)
+            val p2f = locations[nx][ny]
             canvas.drawLine(p1i.x, p1i.y, p1f.x, p1f.y, paint)
             canvas.drawLine(p2i.x, p2i.y, p2f.x, p2f.y, paint)
         }

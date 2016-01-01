@@ -23,20 +23,20 @@ public class GameActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
-        val game : Game = getIntent().getExtras().getSerializable(ARG_GAME) as Game
+        val game : Game = intent.extras.getSerializable(ARG_GAME) as Game
         val fragment = GameFragment.newInstance(game)
-        getFragmentManager().beginTransaction()
+        fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment, null)
                 .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        getMenuInflater().inflate(R.menu.game, menu)
+        menuInflater.inflate(R.menu.game, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.getItemId()) {
+        return when (item.itemId) {
             R.id.action_undo_move -> {
                 true
             }

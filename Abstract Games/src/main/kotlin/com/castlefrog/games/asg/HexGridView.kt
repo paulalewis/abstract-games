@@ -99,14 +99,12 @@ public class HexGridView : View {
     }
 
     override fun onTouchEvent(mv: MotionEvent): Boolean {
-        if (isEnabled()) {
-            val x = mv.getX()
-            val y = mv.getY()
+        if (isEnabled) {
             for (i in 0..boardSize - 1) {
                 for (j in 0..boardSize - 1) {
                     val point = locations[i][j]
                     // TODO - get all points in each hex rather than just inscribed circle
-                    if (Math.hypot((point.x - x).toDouble(), (point.y - y).toDouble()) < hexagonCRadius) {
+                    if (Math.hypot((point.x - mv.x).toDouble(), (point.y - mv.y).toDouble()) < hexagonCRadius) {
                         hexTouchListener.onHexTouchEvent(i, j, mv)
                         return true
                     }
@@ -118,10 +116,6 @@ public class HexGridView : View {
 
     override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
-        val paddingLeft = getPaddingLeft()
-        val paddingTop = getPaddingTop()
-        val paddingRight = getPaddingRight()
-        val paddingBottom = getPaddingBottom()
         val contentWidth = width - paddingLeft - paddingRight
         val contentHeight = height - paddingTop - paddingBottom
 
@@ -157,10 +151,10 @@ public class HexGridView : View {
         super.onDraw(canvas)
         //draw board
         val matrix = Matrix()
-        paint.setStyle(Paint.Style.FILL)
+        paint.style = Paint.Style.FILL
         for (i in 0..boardSize - 1) {
             for (j in 0..boardSize - 1) {
-                paint.setColor(paletteColors.get(locationColors[i][j]) ?: boardBackgroundColor)
+                paint.color = paletteColors[locationColors[i][j]] ?: boardBackgroundColor
                 val temp = Path()
                 val point = locations[i][j]
                 matrix.reset()
@@ -170,9 +164,9 @@ public class HexGridView : View {
             }
         }
         // draw board inner edges
-        paint.setStyle(Paint.Style.STROKE)
-        paint.setColor(boardOutlineColor)
-        paint.setStrokeWidth(lineWidth)
+        paint.style = Paint.Style.STROKE
+        paint.color = boardOutlineColor
+        paint.strokeWidth = lineWidth
         for (row in locations) {
             for (point in row) {
                 val temp = Path()
@@ -189,7 +183,7 @@ public class HexGridView : View {
     }
 
     public fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
-        locationColors.get(x).set(y, colorIndex.toByte())
+        locationColors[x][y] = colorIndex.toByte()
         invalidate()
     }
 }
