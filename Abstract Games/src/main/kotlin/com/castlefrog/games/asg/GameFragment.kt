@@ -84,7 +84,7 @@ public class GameFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        activity.actionBar.title = resources.getString(game?.domain?.type?.nameRes!!)
+        activity.actionBar?.title = resources.getString(game?.domain?.type?.nameRes!!)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
