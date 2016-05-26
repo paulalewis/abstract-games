@@ -1,7 +1,6 @@
 package com.castlefrog.games.asg
 
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,20 +28,20 @@ class SelectGameTypeAdapter(val contents: List<Pair<Domain, View>>, val onItemCl
         }
     }
 
-    override public fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_game_type_item, viewGroup, false)
         val holder = ViewHolder(view)
         view.setOnClickListener({ onItemClickListener.onItemClick(holder.adapterPosition) })
         return holder;
     }
 
-    override public fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val domainName = viewHolder.itemView.resources.getString(contents[position].first.type.nameRes)
         viewHolder.gameText.text = domainName
         viewHolder.gameIcon.addView(contents[position].second)
     }
 
-    override public fun getItemCount(): Int {
+    override fun getItemCount(): Int {
         return contents.size
     }
 }

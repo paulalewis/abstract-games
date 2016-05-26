@@ -37,7 +37,7 @@ class SelectGameTypeFragment : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        var view = inflater.inflate(R.layout.fragment_select_game_type, container, false)
+        val view = inflater.inflate(R.layout.fragment_select_game_type, container, false)
         recyclerView = view.findViewById(R.id.recyclerView) as RecyclerView
         recyclerView?.layoutManager = GridLayoutManager(activity, 3)
         recyclerView?.adapter = (SelectGameTypeAdapter(contents, object: SelectGameTypeAdapter.OnItemClickListener {

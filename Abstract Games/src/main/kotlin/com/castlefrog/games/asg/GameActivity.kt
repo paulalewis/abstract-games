@@ -8,13 +8,13 @@ import android.view.Menu
 import android.view.MenuItem
 import com.castlefrog.games.asg.model.Game
 
-public class GameActivity : Activity() {
+class GameActivity : Activity() {
 
     companion object {
         val ARG_GAME = "game"
 
         fun navigate(context: Context, game: Game): Unit {
-            val intent = Intent(context, javaClass<GameActivity>())
+            val intent = Intent(context, GameActivity::class.java)
             intent.putExtra(ARG_GAME, game)
             context.startActivity(intent)
         }

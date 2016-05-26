@@ -12,7 +12,7 @@ import android.view.View
 import android.widget.ImageView
 import com.caverock.androidsvg.SVG
 
-public class MainActivity : Activity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
