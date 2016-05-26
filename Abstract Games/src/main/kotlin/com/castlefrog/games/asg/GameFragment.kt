@@ -22,9 +22,8 @@ import com.castlefrog.games.asg.model.Domain
 import com.castlefrog.games.asg.model.DomainType
 import com.castlefrog.games.asg.model.Game
 import java.util.*
-import java.util.concurrent.Executors
 
-public class GameFragment : Fragment() {
+class GameFragment : Fragment() {
 
     companion object {
         val ARG_GAME = "game"
@@ -33,7 +32,7 @@ public class GameFragment : Fragment() {
             val args = Bundle()
             args.putSerializable(ARG_GAME, game)
             val fragment = GameFragment()
-            fragment.setArguments(args)
+            fragment.arguments = args
             return fragment
         }
     }
@@ -48,7 +47,7 @@ public class GameFragment : Fragment() {
         super.onCreate(savedInstanceState)
         val bundle = savedInstanceState ?: arguments
         game = bundle.getSerializable(ARG_GAME) as Game
-        val resId = resources.getIdentifier("help_uri_" + game?.domain?.type?.name()?.toLowerCase(), "string", activity.packageName)
+        val resId = resources.getIdentifier("help_uri_" + activity.getString(game?.domain?.type?.nameRes!!).toLowerCase(), "string", activity.packageName)
         helpUri = Uri.parse(getString(resId))
         setHasOptionsMenu(true)
 
@@ -121,7 +120,7 @@ public class GameFragment : Fragment() {
         return view
     }
 
-    override public fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_undo_move -> {
                 true
