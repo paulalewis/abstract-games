@@ -3,17 +3,17 @@ package com.castlefrog.games.asg
 import android.graphics.Matrix
 import android.graphics.Path
 
-public class PathUtils {
+class PathUtils {
     companion object {
-        public val HEXAGON_RADIUS: Float = 1f
-        public val HEXAGON_HALF_RADIUS: Float = HEXAGON_RADIUS * 0.5f
-        public val HEXAGON_SHORT_RADIUS: Float = HEXAGON_HALF_RADIUS * Math.sqrt(3.0).toFloat()
+        val HEXAGON_RADIUS: Float = 1f
+        val HEXAGON_HALF_RADIUS: Float = HEXAGON_RADIUS * 0.5f
+        val HEXAGON_SHORT_RADIUS: Float = HEXAGON_HALF_RADIUS * Math.sqrt(3.0).toFloat()
 
         /**
          * @param radius of the circumscribed circle
          * @return a Path object in the shape of a hexagon
          */
-        public fun getHexagon(radius: Float): Path {
+        fun getHexagon(radius: Float): Path {
             return getRegularPolygon(6, radius)
         }
 
@@ -23,7 +23,7 @@ public class PathUtils {
          * @param radius radius of the circumscribed circle
          * @return a Path object in the shape of a regular polygon
          */
-        public fun getRegularPolygon(nSides: Int, radius: Float): Path {
+        fun getRegularPolygon(nSides: Int, radius: Float): Path {
             val path = Path()
             if (nSides < 3) {
                 return path
