@@ -1,6 +1,5 @@
 package com.castlefrog.games.asg
 
-import android.app.ActionBar
 import android.app.Fragment
 import android.content.Intent
 import android.graphics.Color
@@ -10,10 +9,8 @@ import android.view.*
 import android.widget.FrameLayout
 import com.castlefrog.agl.Agent
 import com.castlefrog.agl.Arbiter
-import com.castlefrog.agl.Simulator
-import com.castlefrog.agl.TurnType
+import com.castlefrog.agl.History
 import com.castlefrog.agl.agents.ExternalAgent
-import com.castlefrog.agl.agents.RandomAgent
 import com.castlefrog.agl.domains.havannah.HavannahSimulator
 import com.castlefrog.agl.domains.hex.HexAction
 import com.castlefrog.agl.domains.hex.HexSimulator
@@ -56,27 +53,27 @@ class GameFragment : Fragment() {
         agents.add(ExternalAgent())
 
         arbiter = createArbiter(game?.domain!!)
-        arbiter!!.setOnStateChangeListener(Arbiter.OnEventListener() {
+        arbiter!!.listener = {
             // update board view
-            val state = arbiter!!.getWorld().getState() as HexState;
+            val state = arbiter!!.world.state as HexState;
             //hexView!!.setLocationColor()
             // TODO - go to next step
-            if (arbiter!!.getWorld()?.isTerminalState() == false) {
-                arbiter!!.stepAsync()
+            if (!arbiter!!.world.isTerminalState) {
+                arbiter!!.step()
             }
-        })
-        arbiter!!.stepAsync()
+        }
+        arbiter!!.step()
     }
 
     private fun createArbiter(domain: Domain) : Arbiter<*, *> {
         when (domain.type) {
             DomainType.HEX -> {
-                val simulator = HexSimulator.create(8, TurnType.SEQUENTIAL)
-                return Arbiter(simulator.state, simulator, agents)
+                val simulator = HexSimulator.create(8, true)
+                return Arbiter(History(simulator.state), simulator, agents)
             }
             DomainType.HAVANNAH -> {
-                val simulator = HavannahSimulator.create(5, TurnType.SEQUENTIAL)
-                return Arbiter(simulator.state, simulator, agents)
+                val simulator = HavannahSimulator.create(5, true)
+                return Arbiter(History(simulator.state), simulator, agents)
             }
         }
     }
@@ -100,16 +97,14 @@ class GameFragment : Fragment() {
             override fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent) {
                 when (mv.action) {
                     MotionEvent.ACTION_UP -> {
-                        for (i in 0..arbiter!!.getWorld().getNAgents() - 1) {
-                            if (arbiter!!.getWorld().hasLegalActions(i)) {
-                                val action = HexAction.valueOf(x, y)
-                                if (arbiter!!.getWorld().getLegalActions(i).contains(action)) {
-                                    val agent = agents.get(i) as ExternalAgent
-                                    agent.setAction(action)
-                                    hexView!!.setLocationColor(x, y, i + 1)
-                                }
-                                break
+                        for (i in 0..arbiter!!.world.nAgents - 1) {
+                            val action = HexAction.valueOf(x, y)
+                            if (action in arbiter!!.world.legalActions[i]) {
+                                val agent = agents[i] as ExternalAgent
+                                agent.setAction(action)
+                                hexView!!.setLocationColor(x, y, i + 1)
                             }
+                            break
                         }
                     }
                 }
