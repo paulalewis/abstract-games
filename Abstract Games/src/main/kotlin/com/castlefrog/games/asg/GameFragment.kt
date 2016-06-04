@@ -24,6 +24,7 @@ class GameFragment : Fragment() {
 
     companion object {
         val ARG_GAME = "game"
+        val ARG_AGENTS = "agents"
 
         fun newInstance(game: Game): GameFragment {
             val args = Bundle()
@@ -53,34 +54,30 @@ class GameFragment : Fragment() {
         agents.add(ExternalAgent())
 
         arbiter = createArbiter(game?.domain!!)
-        arbiter!!.listener = {
-            // update board view
-            val state = arbiter!!.world.state as HexState;
-            //hexView!!.setLocationColor()
-            // TODO - go to next step
-            if (!arbiter!!.world.isTerminalState) {
-                arbiter!!.step()
-            }
-        }
-        arbiter!!.step()
+        arbiter?.step()
     }
 
     private fun createArbiter(domain: Domain) : Arbiter<*, *> {
-        when (domain.type) {
+        val arbiter = when (domain.type) {
             DomainType.HEX -> {
                 val simulator = HexSimulator.create(8, true)
-                return Arbiter(History(simulator.state), simulator, agents)
+                Arbiter(History(simulator.state), simulator, agents)
             }
             DomainType.HAVANNAH -> {
                 val simulator = HavannahSimulator.create(5, true)
-                return Arbiter(History(simulator.state), simulator, agents)
+                Arbiter(History(simulator.state), simulator, agents)
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        activity.actionBar?.title = resources.getString(game?.domain?.type?.nameRes!!)
+        arbiter.listener = {
+            // update board view
+            val state = arbiter.world.state as HexState;
+            //hexView!!.setLocationColor()
+            // go to next step
+            if (!arbiter.world.isTerminalState) {
+                arbiter.step()
+            }
+        }
+        return arbiter
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -89,30 +86,33 @@ class GameFragment : Fragment() {
 
         // TODO - change look base on game
         hexView = HexGridView(activity)
-        hexView?.boardSize = 5
+        hexView?.size = 5
         hexView?.boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
         hexView?.paletteColors?.put(1, Color.RED)
         hexView?.paletteColors?.put(2, Color.BLUE)
-        hexView?.setOnHexTouchListener(object : HexGridView.HexTouchListener {
-            override fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent) {
-                when (mv.action) {
-                    MotionEvent.ACTION_UP -> {
-                        for (i in 0..arbiter!!.world.nAgents - 1) {
-                            val action = HexAction.valueOf(x, y)
-                            if (action in arbiter!!.world.legalActions[i]) {
-                                val agent = agents[i] as ExternalAgent
-                                agent.setAction(action)
-                                hexView!!.setLocationColor(x, y, i + 1)
-                            }
-                            break
+        hexView?.touchListener = { x, y, mv ->
+            when (mv.action) {
+                MotionEvent.ACTION_UP -> {
+                    for (i in 0..arbiter!!.world.nAgents - 1) {
+                        val action = HexAction.valueOf(x, y)
+                        if (action in arbiter!!.world.legalActions[i]) {
+                            val agent = agents[i] as ExternalAgent
+                            agent.setAction(action)
+                            hexView!!.setLocationColor(x, y, i + 1)
                         }
+                        break
                     }
                 }
             }
-        })
+        }
 
         gameViewContainer.addView(hexView)
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity.actionBar?.title = resources.getString(game?.domain?.type?.nameRes!!)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
