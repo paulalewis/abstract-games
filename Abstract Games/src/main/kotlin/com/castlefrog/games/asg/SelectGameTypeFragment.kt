@@ -27,11 +27,11 @@ class SelectGameTypeFragment : DialogFragment() {
     override fun onCreate(bundle: Bundle?) {
         super.onCreate(bundle)
         val hexIconView = HexGridView(activity)
-        hexIconView.boardSize = 3
+        hexIconView.size = 3
         hexIconView.boardBackgroundColor = Color.GRAY
         contents.add(Pair<Domain, View>(Domain(DomainType.HEX), hexIconView))
         val havannahIconView = HexGridView(activity)
-        havannahIconView.boardSize = 3
+        havannahIconView.size = 3
         havannahIconView.boardBackgroundColor = Color.GRAY
         contents.add(Pair<Domain, View>(Domain(DomainType.HAVANNAH), havannahIconView))
     }

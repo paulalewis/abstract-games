@@ -53,15 +53,15 @@ public class HavannahView : View {
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
         // Load attributes
-        val a = context.obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0)
+        val a = context.obtainStyledAttributes(attrs, R.styleable.HexGridView, defStyle, 0)
 
-        boardSize = a.getInt(R.styleable.HexView_boardSize, DEFAULT_BOARD_SIZE)
-        val boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, Color.GRAY)
-        val agent1Color = a.getColor(R.styleable.HexView_agent1Color, Color.RED)
-        val agent2Color = a.getColor(R.styleable.HexView_agent2Color, Color.BLUE)
-        val connectionColor = a.getColor(R.styleable.HexView_connectionColor, Color.WHITE)
-        boardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, boardOutlineColor)
-        lineColor = a.getColor(R.styleable.HexView_lineColor, lineColor)
+        boardSize = a.getInt(R.styleable.HexGridView_boardSize, DEFAULT_BOARD_SIZE)
+        val boardBackgroundColor = a.getColor(R.styleable.HexGridView_boardBackgroundColor, Color.GRAY)
+        val agent1Color = a.getColor(R.styleable.HexGridView_agent1Color, Color.RED)
+        val agent2Color = a.getColor(R.styleable.HexGridView_agent2Color, Color.BLUE)
+        val connectionColor = a.getColor(R.styleable.HexGridView_connectionColor, Color.WHITE)
+        boardOutlineColor = a.getColor(R.styleable.HexGridView_boardOutlineColor, boardOutlineColor)
+        lineColor = a.getColor(R.styleable.HexGridView_lineColor, lineColor)
 
         a.recycle()
 

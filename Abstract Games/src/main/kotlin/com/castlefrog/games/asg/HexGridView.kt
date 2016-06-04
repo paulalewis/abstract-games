@@ -15,40 +15,26 @@ import java.util.Vector
 class HexGridView : View {
 
     companion object {
-        private val MIN_BOARD_SIZE = 1
+        private val MIN_SIZE = 1
         private val DEFAULT_LINE_WIDTH_RATIO = 0.1f
         private val DEFAULT_OUTLINE_COLOR = Color.WHITE
         private val DEFAULT_BACKGROUND_COLOR = Color.GRAY
     }
 
-    /**
-     * Get a touch event on a specific hex
-     */
-    interface HexTouchListener {
-        fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent)
-    }
-
-    /**
-     * Dummy listener to use instead of null
-     */
-    private class DummyHexTouchListener : HexTouchListener {
-        override fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent) {}
-    }
-
     /** Size of the hex grid */
-    var boardSize: Int = MIN_BOARD_SIZE
+    var size: Int = MIN_SIZE
         set(value) {
-            if (boardSize != value) {
-                field = Math.max(MIN_BOARD_SIZE, value)
+            if (size != value) {
+                field = Math.max(MIN_SIZE, value)
                 locations.clear()
-                for (i in 1..boardSize) {
+                for (i in 1..size) {
                     val temp = ArrayList<PointF>()
-                    for (j in 1..boardSize) {
+                    for (j in 1..size) {
                         temp.add(PointF())
                     }
                     locations.add(temp)
                 }
-                locationColors = Array(boardSize, { ByteArray(boardSize) })
+                locationColors = Array(size, { ByteArray(size) })
                 invalidate()
             }
         }
@@ -60,12 +46,12 @@ class HexGridView : View {
             invalidate()
         }
 
-    var locationColors: Array<ByteArray> = Array(boardSize, { ByteArray(boardSize) })
+    var locationColors: Array<ByteArray> = Array(size, { ByteArray(size) })
     val paletteColors: MutableMap<Byte, Int> = HashMap()
     var boardOutlineColor: Int = DEFAULT_OUTLINE_COLOR
     var boardBackgroundColor: Int = DEFAULT_BACKGROUND_COLOR
 
-    var hexTouchListener: HexTouchListener = DummyHexTouchListener()
+    var touchListener: (x: Int, y: Int, mv: MotionEvent) -> Unit = { x, y, mv -> }
 
     private val locations: MutableList<List<PointF>> = ArrayList()
     private var hexagon = Path()
@@ -74,6 +60,8 @@ class HexGridView : View {
     private var hexagonCRadius = 0f
 
     private val paint = Paint()
+    private val drawMatrix = Matrix()
+    private val drawPath = Path()
     private var lineWidth = 0f
 
     constructor(context: Context) : super(context) {
@@ -89,23 +77,23 @@ class HexGridView : View {
     }
 
     private fun init(attrs: AttributeSet?, defStyle: Int) {
-        val a = getContext().obtainStyledAttributes(attrs, R.styleable.HexView, defStyle, 0)
+        val a = context.obtainStyledAttributes(attrs, R.styleable.HexGridView, defStyle, 0)
 
-        boardSize = a.getInt(R.styleable.HexView_boardSize, boardSize)
-        boardBackgroundColor = a.getColor(R.styleable.HexView_boardBackgroundColor, boardBackgroundColor)
-        boardOutlineColor = a.getColor(R.styleable.HexView_boardOutlineColor, boardOutlineColor)
+        size = a.getInt(R.styleable.HexGridView_boardSize, size)
+        boardBackgroundColor = a.getColor(R.styleable.HexGridView_boardBackgroundColor, boardBackgroundColor)
+        boardOutlineColor = a.getColor(R.styleable.HexGridView_boardOutlineColor, boardOutlineColor)
 
         a.recycle()
     }
 
     override fun onTouchEvent(mv: MotionEvent): Boolean {
         if (isEnabled) {
-            for (i in 0..boardSize - 1) {
-                for (j in 0..boardSize - 1) {
+            for (i in 0..size - 1) {
+                for (j in 0..size - 1) {
                     val point = locations[i][j]
                     // TODO - get all points in each hex rather than just inscribed circle
                     if (Math.hypot((point.x - mv.x).toDouble(), (point.y - mv.y).toDouble()) < hexagonCRadius) {
-                        hexTouchListener.onHexTouchEvent(i, j, mv)
+                        touchListener(i, j, mv)
                         return true
                     }
                 }
@@ -120,27 +108,27 @@ class HexGridView : View {
         val contentHeight = height - paddingTop - paddingBottom
 
         // pre-calc line width
-        var maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f)
-        var maxHexHeight = ((2 * contentHeight) / (3 * boardSize - 1)).toFloat()
+        var maxHexWidth = contentWidth / (0.75f * size + 0.25f)
+        var maxHexHeight = ((2 * contentHeight) / (3 * size - 1)).toFloat()
         hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
         lineWidth = hexagonRadius * lineWidthRatio
 
-        maxHexWidth = contentWidth / (0.75f * boardSize + 0.25f)
-        maxHexHeight = (2 * (contentHeight - lineWidth)) / (3 * boardSize - 1)
+        maxHexWidth = contentWidth / (0.75f * size + 0.25f)
+        maxHexHeight = (2 * (contentHeight - lineWidth)) / (3 * size - 1)
         hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
 
         hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius
         hexagon = PathUtils.getHexagon(hexagonRadius)
-        val boardWidth = hexagonRadius * (1.5f * boardSize + 0.5f)
-        val boardHeight = hexagonCRadius * (3 * boardSize - 1)
+        val boardWidth = hexagonRadius * (1.5f * size + 0.5f)
+        val boardHeight = hexagonCRadius * (3 * size - 1)
         val xPadding = (width - boardWidth) / 2
         val yPadding = (height - boardHeight) / 2
-        val yAdjust = hexagonCRadius * (boardSize - 1)
+        val yAdjust = hexagonCRadius * (size - 1)
 
         val x0 = xPadding + hexagonRadius
         val y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius) - 1.5f * lineWidth
-        for (i in 0..boardSize - 1) {
-            for (j in 0..boardSize - 1) {
+        for (i in 0..size - 1) {
+            for (j in 0..size - 1) {
                 locations[i][j].x = x0 + i * hexagonRadius * 1.5f
                 locations[i][j].y = y0 - i * hexagonCRadius + j * 2 * hexagonCRadius
             }
@@ -150,17 +138,16 @@ class HexGridView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         //draw board
-        val matrix = Matrix()
         paint.style = Paint.Style.FILL
-        for (i in 0..boardSize - 1) {
-            for (j in 0..boardSize - 1) {
+        for (i in 0..size - 1) {
+            for (j in 0..size - 1) {
                 paint.color = paletteColors[locationColors[i][j]] ?: boardBackgroundColor
-                val temp = Path()
                 val point = locations[i][j]
-                matrix.reset()
-                matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                hexagon.transform(matrix, temp)
-                canvas.drawPath(temp, paint)
+                drawMatrix.reset()
+                drawMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                drawPath.reset()
+                hexagon.transform(drawMatrix, drawPath)
+                canvas.drawPath(drawPath, paint)
             }
         }
         // draw board inner edges
@@ -169,17 +156,13 @@ class HexGridView : View {
         paint.strokeWidth = lineWidth
         for (row in locations) {
             for (point in row) {
-                val temp = Path()
-                matrix.reset()
-                matrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                hexagon.transform(matrix, temp)
-                canvas.drawPath(temp, paint)
+                drawMatrix.reset()
+                drawMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                drawPath.reset()
+                hexagon.transform(drawMatrix, drawPath)
+                canvas.drawPath(drawPath, paint)
             }
         }
-    }
-
-    fun setOnHexTouchListener(listener: HexTouchListener) {
-        hexTouchListener = listener
     }
 
     fun setLocationColor(x: Int, y: Int, colorIndex: Int) {

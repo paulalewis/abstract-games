@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="HexView">
+    <declare-styleable name="HexGridView">
         <attr name="boardSize" format="integer" />
         <attr name="boardBackgroundColor" format="color" />
         <attr name="agent1Color" format="color" />
