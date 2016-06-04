@@ -12,7 +12,7 @@ import java.util.Collections
 import java.util.HashMap
 import java.util.Vector
 
-public class HexGridView : View {
+class HexGridView : View {
 
     companion object {
         private val MIN_BOARD_SIZE = 1
@@ -24,8 +24,8 @@ public class HexGridView : View {
     /**
      * Get a touch event on a specific hex
      */
-    public interface HexTouchListener {
-        public fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent)
+    interface HexTouchListener {
+        fun onHexTouchEvent(x: Int, y: Int, mv: MotionEvent)
     }
 
     /**
@@ -36,7 +36,7 @@ public class HexGridView : View {
     }
 
     /** Size of the hex grid */
-    public var boardSize: Int = MIN_BOARD_SIZE
+    var boardSize: Int = MIN_BOARD_SIZE
         set(value) {
             if (boardSize != value) {
                 field = Math.max(MIN_BOARD_SIZE, value)
@@ -54,18 +54,18 @@ public class HexGridView : View {
         }
 
     /** Ratio of line width to hex width. Must be value between 0 and 1 */
-    public var lineWidthRatio: Float = DEFAULT_LINE_WIDTH_RATIO
+    var lineWidthRatio: Float = DEFAULT_LINE_WIDTH_RATIO
         set(value) {
             lineWidthRatio = if (value >= 0 && value <= 1) value else lineWidthRatio
             invalidate()
         }
 
-    public var locationColors: Array<ByteArray> = Array(boardSize, { ByteArray(boardSize) })
-    public val paletteColors: MutableMap<Byte, Int> = HashMap()
-    public var boardOutlineColor: Int = DEFAULT_OUTLINE_COLOR
-    public var boardBackgroundColor: Int = DEFAULT_BACKGROUND_COLOR
+    var locationColors: Array<ByteArray> = Array(boardSize, { ByteArray(boardSize) })
+    val paletteColors: MutableMap<Byte, Int> = HashMap()
+    var boardOutlineColor: Int = DEFAULT_OUTLINE_COLOR
+    var boardBackgroundColor: Int = DEFAULT_BACKGROUND_COLOR
 
-    public var hexTouchListener: HexTouchListener = DummyHexTouchListener()
+    var hexTouchListener: HexTouchListener = DummyHexTouchListener()
 
     private val locations: MutableList<List<PointF>> = ArrayList()
     private var hexagon = Path()
@@ -76,15 +76,15 @@ public class HexGridView : View {
     private val paint = Paint()
     private var lineWidth = 0f
 
-    public constructor(context: Context) : super(context) {
+    constructor(context: Context) : super(context) {
         init(null, 0)
     }
 
-    public constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         init(attrs, 0)
     }
 
-    public constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         init(attrs, defStyle)
     }
 
@@ -178,11 +178,11 @@ public class HexGridView : View {
         }
     }
 
-    public fun setOnHexTouchListener(listener: HexTouchListener) {
+    fun setOnHexTouchListener(listener: HexTouchListener) {
         hexTouchListener = listener
     }
 
-    public fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
+    fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
         locationColors[x][y] = colorIndex.toByte()
         invalidate()
     }
