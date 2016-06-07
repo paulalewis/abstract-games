@@ -30,26 +30,4 @@ class GameActivity : Activity() {
                 .commit()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.game, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_undo_move -> {
-                true
-            }
-            R.id.action_redo_move -> {
-                true
-            }
-            R.id.action_about -> {
-                //startActivity(Intent(Intent.ACTION_VIEW, helpUri))
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item);
-            }
-        }
-    }
 }
