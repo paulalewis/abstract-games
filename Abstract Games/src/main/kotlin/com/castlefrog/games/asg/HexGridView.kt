@@ -5,12 +5,8 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.castlefrog.agl.Arbiter
-import com.castlefrog.agl.domains.havannah.HavannahAction
 import java.util.ArrayList
-import java.util.Collections
 import java.util.HashMap
-import java.util.Vector
 
 class HexGridView : View {
 
@@ -91,8 +87,8 @@ class HexGridView : View {
             for (i in 0..size - 1) {
                 for (j in 0..size - 1) {
                     val point = locations[i][j]
-                    // TODO - get all points in each hex rather than just inscribed circle
-                    if (Math.hypot((point.x - mv.x).toDouble(), (point.y - mv.y).toDouble()) < hexagonCRadius) {
+                    val centerPoint = PointF(point.x, point.y)
+                    if (windingNumberTest(PointF(mv.x, mv.y), getHexPoints(centerPoint)) != 0) {
                         touchListener(i, j, mv)
                         return true
                     }
@@ -168,5 +164,80 @@ class HexGridView : View {
     fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
         locationColors[x][y] = colorIndex.toByte()
         invalidate()
+    }
+
+    /**
+     * tests if a point is Left|On|Right of an infinite line
+     * @return >0 for p2 left of the line through p0 and p1
+     *         =0 for p2 on the line
+     *         <0 for p2 right of the line
+     */
+    private fun isLeftOfEdge(p0: PointF, p1: PointF, p2: PointF): Boolean {
+        return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x -  p0.x) * (p1.y - p0.y)) > 0
+    }
+
+    private fun isRightOfEdge(p0: PointF, p1: PointF, p2: PointF): Boolean {
+        return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x -  p0.x) * (p1.y - p0.y)) < 0
+    }
+
+    private fun getHexPoints(point: PointF): List<PointF> {
+        val hexPoints = ArrayList<PointF>()
+        val xOffset = Math.sqrt((hexagonRadius * hexagonRadius - hexagonCRadius * hexagonCRadius).toDouble()).toFloat()
+        hexPoints.add(PointF(point.x - hexagonRadius, point.y))
+        hexPoints.add(PointF(point.x - xOffset, point.y - hexagonCRadius))
+        hexPoints.add(PointF(point.x + xOffset, point.y - hexagonCRadius))
+        hexPoints.add(PointF(point.x + hexagonRadius, point.y))
+        hexPoints.add(PointF(point.x + xOffset, point.y + hexagonCRadius))
+        hexPoints.add(PointF(point.x - xOffset, point.y + hexagonCRadius))
+        return hexPoints
+    }
+
+    /**
+     * crossing number test for a point in a polygon
+     * @point a point that could be inside or outside polygon
+     * @vertices vertex points of a polygon V[n+1] with V[n]=V[0]
+     * @return 0 = outside, 1 = inside
+     */
+    private fun crossingNumberTest(point: Point, vertices: List<Point>): Int {
+        var crossingNumber: Int = 0
+
+        // loop through all edges of the polygon
+        for (i in 0..vertices.size - 1) {
+            val vi = vertices[i]
+            val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
+            if (((vi.y <= point.y) && (vf.y > point.y)) // an upward crossing
+                    || ((vi.y > point.y) && (vf.y <=  point.y))) { // a downward crossing
+                // compute  the actual edge-ray intersect x-coordinate
+                val vt: Float = (point.y  - vi.y) / (vf.y - vi.y).toFloat()
+                if (point.x < vi.x + vt * (vf.x - vi.x)) // P.x < intersect
+                    crossingNumber += 1 // a valid crossing of y=P.y right of P.x
+            }
+        }
+        return crossingNumber and 1
+    }
+
+    /**
+     * winding number test for a point in a polygon
+     * @param point a point to check if inside polygon
+     * @param vertices the vertices of the polygon
+     * @return the winding number, is 0 when point is outside polygon
+     */
+    private fun windingNumberTest(point: PointF, vertices: List<PointF>): Int {
+        var windingNumber = 0
+        // loop through all edges of the polygon
+        for (i in 0..vertices.size - 1) {
+            val vi = vertices[i]
+            val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
+            if (vi.y <= point.y) { // start y <= P.y
+                if (vf.y  > point.y) // an upward crossing
+                    if (isLeftOfEdge(vi, vf, point))
+                        windingNumber += 1 // have  a valid up intersect
+            } else { // start y > P.y (no test needed)
+                if (vf.y  <= point.y)     // a downward crossing
+                    if (isRightOfEdge(vi, vf, point))
+                        windingNumber -= 1 // have  a valid down intersect
+            }
+        }
+        return windingNumber
     }
 }
