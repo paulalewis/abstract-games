@@ -5,12 +5,9 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.castlefrog.agl.domains.havannah.HavannahAction
-import java.util.ArrayList
-import java.util.HashMap
-import java.util.Vector
+import java.util.*
 
-public class HavannahView : View {
+class HavannahView : View {
 
     companion object {
         private val DEFAULT_BOARD_SIZE = 5
@@ -39,15 +36,15 @@ public class HavannahView : View {
 
     //public var selectActionListener: SelectActionListener<HavannahAction> = DummySelectActionListener()
 
-    public constructor(context: Context) : super(context) {
+    constructor(context: Context) : super(context) {
         init(null, 0)
     }
 
-    public constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         init(attrs, 0)
     }
 
-    public constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         init(attrs, defStyle)
     }
 
@@ -74,12 +71,12 @@ public class HavannahView : View {
         locations.setSize(boardSize)
         val sideLength = (boardSize + 1) / 2
         for (i in 0..sideLength - 1) {
-            locations.set(i, Vector<PointF>())
-            locations.get(i).setSize(sideLength + i)
+            locations[i] = Vector<PointF>()
+            locations[i].setSize(sideLength + i)
         }
         for (i in sideLength..boardSize - 1) {
-            locations.set(i, Vector<PointF>())
-            locations.get(i).setSize(boardSize + sideLength - i - 1)
+            locations[i] = Vector<PointF>()
+            locations[i].setSize(boardSize + sideLength - i - 1)
         }
 
         locationColors = Array(boardSize, { ByteArray(boardSize) })

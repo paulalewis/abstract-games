@@ -70,7 +70,7 @@ class GameFragment : Fragment() {
         }
         arbiter.listener = {
             // update board view
-            val state = arbiter.world.state as HexState;
+            val state = arbiter.world.state as HexState
             //hexView!!.setLocationColor()
             // go to next step
             if (!arbiter.world.isTerminalState) {
@@ -128,7 +128,7 @@ class GameFragment : Fragment() {
                 true
             }
             else -> {
-                super.onOptionsItemSelected(item);
+                super.onOptionsItemSelected(item)
             }
         }
     }

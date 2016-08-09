@@ -49,6 +49,6 @@ class SelectGameTypeFragment : DialogFragment() {
                 GameActivity.navigate(activity, game)
             }
         }))
-        return view;
+        return view
     }
 }

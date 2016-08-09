@@ -4,11 +4,9 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.castlefrog.games.asg.model.Domain
-import java.util.ArrayList
 
 /**
  */
@@ -32,7 +30,7 @@ class SelectGameTypeAdapter(val contents: List<Pair<Domain, View>>, val onItemCl
         val view = LayoutInflater.from(viewGroup.context).inflate(R.layout.view_game_type_item, viewGroup, false)
         val holder = ViewHolder(view)
         view.setOnClickListener({ onItemClickListener.onItemClick(holder.adapterPosition) })
-        return holder;
+        return holder
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
