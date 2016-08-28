@@ -106,15 +106,15 @@ class HexGridView : View {
         // pre-calc line width
         var maxHexWidth = contentWidth / (0.75f * size + 0.25f)
         var maxHexHeight = ((2 * contentHeight) / (3 * size - 1)).toFloat()
-        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
+        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / HEXAGON_SHORT_RADIUS) / 2
         lineWidth = hexagonRadius * lineWidthRatio
 
         maxHexWidth = contentWidth / (0.75f * size + 0.25f)
         maxHexHeight = (2 * (contentHeight - lineWidth)) / (3 * size - 1)
-        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / PathUtils.HEXAGON_SHORT_RADIUS) / 2
+        hexagonRadius = Math.min(maxHexWidth, maxHexHeight / HEXAGON_SHORT_RADIUS) / 2
 
-        hexagonCRadius = PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius
-        hexagon = PathUtils.getHexagon(hexagonRadius)
+        hexagonCRadius = HEXAGON_SHORT_RADIUS * hexagonRadius
+        hexagon = getHexagon(hexagonRadius)
         val boardWidth = hexagonRadius * (1.5f * size + 0.5f)
         val boardHeight = hexagonCRadius * (3 * size - 1)
         val xPadding = (width - boardWidth) / 2
@@ -122,7 +122,7 @@ class HexGridView : View {
         val yAdjust = hexagonCRadius * (size - 1)
 
         val x0 = xPadding + hexagonRadius
-        val y0 = yAdjust + yPadding + (PathUtils.HEXAGON_SHORT_RADIUS * hexagonRadius) - 1.5f * lineWidth
+        val y0 = yAdjust + yPadding + (HEXAGON_SHORT_RADIUS * hexagonRadius) - 1.5f * lineWidth
         for (i in 0..size - 1) {
             for (j in 0..size - 1) {
                 locations[i][j].x = x0 + i * hexagonRadius * 1.5f
@@ -166,20 +166,6 @@ class HexGridView : View {
         invalidate()
     }
 
-    /**
-     * tests if a point is Left|On|Right of an infinite line
-     * @return >0 for p2 left of the line through p0 and p1
-     *         =0 for p2 on the line
-     *         <0 for p2 right of the line
-     */
-    private fun isLeftOfEdge(p0: PointF, p1: PointF, p2: PointF): Boolean {
-        return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x -  p0.x) * (p1.y - p0.y)) > 0
-    }
-
-    private fun isRightOfEdge(p0: PointF, p1: PointF, p2: PointF): Boolean {
-        return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x -  p0.x) * (p1.y - p0.y)) < 0
-    }
-
     private fun getHexPoints(point: PointF): List<PointF> {
         val hexPoints = ArrayList<PointF>()
         val xOffset = Math.sqrt((hexagonRadius * hexagonRadius - hexagonCRadius * hexagonCRadius).toDouble()).toFloat()
@@ -192,52 +178,4 @@ class HexGridView : View {
         return hexPoints
     }
 
-    /**
-     * crossing number test for a point in a polygon
-     * @point a point that could be inside or outside polygon
-     * @vertices vertex points of a polygon V[n+1] with V[n]=V[0]
-     * @return 0 = outside, 1 = inside
-     */
-    private fun crossingNumberTest(point: Point, vertices: List<Point>): Int {
-        var crossingNumber: Int = 0
-
-        // loop through all edges of the polygon
-        for (i in 0..vertices.size - 1) {
-            val vi = vertices[i]
-            val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
-            if (((vi.y <= point.y) && (vf.y > point.y)) // an upward crossing
-                    || ((vi.y > point.y) && (vf.y <=  point.y))) { // a downward crossing
-                // compute  the actual edge-ray intersect x-coordinate
-                val vt: Float = (point.y  - vi.y) / (vf.y - vi.y).toFloat()
-                if (point.x < vi.x + vt * (vf.x - vi.x)) // P.x < intersect
-                    crossingNumber += 1 // a valid crossing of y=P.y right of P.x
-            }
-        }
-        return crossingNumber and 1
-    }
-
-    /**
-     * winding number test for a point in a polygon
-     * @param point a point to check if inside polygon
-     * @param vertices the vertices of the polygon
-     * @return the winding number, is 0 when point is outside polygon
-     */
-    private fun windingNumberTest(point: PointF, vertices: List<PointF>): Int {
-        var windingNumber = 0
-        // loop through all edges of the polygon
-        for (i in 0..vertices.size - 1) {
-            val vi = vertices[i]
-            val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
-            if (vi.y <= point.y) { // start y <= P.y
-                if (vf.y  > point.y) // an upward crossing
-                    if (isLeftOfEdge(vi, vf, point))
-                        windingNumber += 1 // have  a valid up intersect
-            } else { // start y > P.y (no test needed)
-                if (vf.y  <= point.y)     // a downward crossing
-                    if (isRightOfEdge(vi, vf, point))
-                        windingNumber -= 1 // have  a valid down intersect
-            }
-        }
-        return windingNumber
-    }
 }

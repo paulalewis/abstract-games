@@ -126,18 +126,18 @@ class HavannahView : View {
 
         // pre-calc for line width
         boardWidth = Math.min(contentWidth, contentHeight).toFloat()
-        boardHeight = boardWidth * (2 * PathUtils.HEXAGON_SHORT_RADIUS * boardSize) / (PathUtils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f))
+        boardHeight = boardWidth * (2 * HEXAGON_SHORT_RADIUS * boardSize) / (HEXAGON_RADIUS * (1.5f * boardSize + 0.5f))
         hexagonCRadius = boardHeight / (2 * boardSize)
-        hexagonRadius = hexagonCRadius / PathUtils.HEXAGON_SHORT_RADIUS
+        hexagonRadius = hexagonCRadius / HEXAGON_SHORT_RADIUS
         lineWidth = hexagonRadius * LINE_WIDTH_RATIO
 
         // re-calc values with known line width
         boardWidth = Math.min(contentWidth, contentHeight).toFloat() - lineWidth
-        boardHeight = boardWidth * (2 * PathUtils.HEXAGON_SHORT_RADIUS * boardSize) / (PathUtils.HEXAGON_RADIUS * (1.5f * boardSize + 0.5f))
+        boardHeight = boardWidth * (2 * HEXAGON_SHORT_RADIUS * boardSize) / (HEXAGON_RADIUS * (1.5f * boardSize + 0.5f))
         hexagonCRadius = boardHeight / (2 * boardSize)
-        hexagonRadius = hexagonCRadius / PathUtils.HEXAGON_SHORT_RADIUS
+        hexagonRadius = hexagonCRadius / HEXAGON_SHORT_RADIUS
 
-        hexagon = PathUtils.getHexagon(hexagonRadius)
+        hexagon = getHexagon(hexagonRadius)
 
         val xPadding = paddingLeft + (width - boardWidth) / 2
         val yPadding = paddingTop + (height - boardHeight) / 2
