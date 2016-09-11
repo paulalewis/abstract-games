@@ -1,13 +1,10 @@
 package com.castlefrog.games.asg
 
-import android.graphics.Matrix
-import android.graphics.Path
-import android.graphics.Point
-import android.graphics.PointF
+import android.graphics.*
 
-val HEXAGON_RADIUS: Float = 1f
-val HEXAGON_HALF_RADIUS: Float = HEXAGON_RADIUS * 0.5f
-val HEXAGON_SHORT_RADIUS: Float = HEXAGON_HALF_RADIUS * Math.sqrt(3.0).toFloat()
+val HEXAGON_RADIUS = 1f
+val HEXAGON_HALF_RADIUS = HEXAGON_RADIUS * 0.5f
+val HEXAGON_SHORT_RADIUS = HEXAGON_HALF_RADIUS * Math.sqrt(3.0).toFloat()
 
 /**
  * @param radius of the circumscribed circle
@@ -46,12 +43,12 @@ fun getRegularPolygon(nSides: Int, radius: Float): Path {
  *         =0 for p2 on the line
  *         <0 for p2 right of the line
  */
-private fun isLeftOfEdge(p0: PointF, p1: PointF, p2: PointF): Boolean {
-    return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x -  p0.x) * (p1.y - p0.y)) > 0
+private fun isLeftOfEdge(p0x: Float, p0y: Float, p1x: Float, p1y: Float, p2x: Float, p2y: Float): Boolean {
+    return ((p1x - p0x) * (p2y - p0y) - (p2x - p0x) * (p1y - p0y)) > 0
 }
 
-private fun isRightOfEdge(p0: PointF, p1: PointF, p2: PointF): Boolean {
-    return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x -  p0.x) * (p1.y - p0.y)) < 0
+private fun isRightOfEdge(p0x: Float, p0y: Float, p1x: Float, p1y: Float, p2x: Float, p2y: Float): Boolean {
+    return ((p1x - p0x) * (p2y - p0y) - (p2x -  p0x) * (p1y - p0y)) < 0
 }
 
 /**
@@ -80,23 +77,29 @@ fun crossingNumberTest(point: Point, vertices: List<Point>): Int {
 
 /**
  * winding number test for a point in a polygon
- * @param point a point to check if inside polygon
- * @param vertices the vertices of the polygon
+ * @param pointX x coordinate of a point to check if inside polygon
+ * @param pointY y coordinate of a point to check if inside polygon
+ * @param vertices the vertices of the polygon in (x,y) coordinate pairs
  * @return the winding number, is 0 when point is outside polygon
  */
-fun windingNumberTest(point: PointF, vertices: List<PointF>): Int {
+fun windingNumberTest(pointX: Float, pointY: Float, vertices: Array<Float>): Int {
+    if (vertices.size % 2 == 1) {
+        throw IllegalArgumentException("Vertices array must have even number of values")
+    }
     var windingNumber = 0
     // loop through all edges of the polygon
-    for (i in 0..vertices.size - 1) {
-        val vi = vertices[i]
-        val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
-        if (vi.y <= point.y) { // start y <= P.y
-            if (vf.y  > point.y) // an upward crossing
-                if (isLeftOfEdge(vi, vf, point))
+    for (i in 0..vertices.size - 2 step 2) {
+        val vix = vertices[i]
+        val viy = vertices[i + 1]
+        val vfx = vertices[if (i == vertices.size - 2) 0 else i + 2]
+        val vfy = vertices[if (i == vertices.size - 2) 1 else i + 3]
+        if (viy <= pointY) { // start y <= P.y
+            if (vfy  > pointY) // an upward crossing
+                if (isLeftOfEdge(vix, viy, vfx, vfy, pointX, pointY))
                     windingNumber += 1 // have  a valid up intersect
         } else { // start y > P.y (no test needed)
-            if (vf.y  <= point.y)     // a downward crossing
-                if (isRightOfEdge(vi, vf, point))
+            if (vfy  <= pointY)     // a downward crossing
+                if (isRightOfEdge(vix, viy, vfx, vfy, pointX, pointY))
                     windingNumber -= 1 // have  a valid down intersect
         }
     }
