@@ -11,7 +11,7 @@ class GameActivity : Activity() {
     companion object {
         val ARG_GAME = "game"
 
-        fun navigate(context: Context, game: Game): Unit {
+        fun navigate(context: Context, game: Game) {
             val intent = Intent(context, GameActivity::class.java)
             intent.putExtra(ARG_GAME, game)
             context.startActivity(intent)

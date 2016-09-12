@@ -20,7 +20,7 @@ import com.castlefrog.games.asg.model.DomainType
 import com.castlefrog.games.asg.model.Game
 import java.util.*
 
-class GameFragment : Fragment() {
+class GameFragment : Fragment(), GameView {
 
     companion object {
         val ARG_GAME = "game"
@@ -35,49 +35,19 @@ class GameFragment : Fragment() {
         }
     }
 
-    private var arbiter: Arbiter<*, *>? = null
-    private val agents: MutableList<Agent> = ArrayList()
-    private var game: Game? = null
-    private var helpUri: Uri? = null
+    private var presenter: GamePresenter? = null
     private var hexView: HexGridView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val bundle = savedInstanceState ?: arguments
-        game = bundle.getSerializable(ARG_GAME) as Game
-        val resId = resources.getIdentifier("help_uri_" + activity.getString(game?.domain?.type?.nameRes!!).toLowerCase(), "string", activity.packageName)
-        helpUri = Uri.parse(getString(resId))
+        val game = bundle.getSerializable(ARG_GAME) as Game
         setHasOptionsMenu(true)
 
-        // TODO - dynamically set agents
-        agents.add(ExternalAgent())
-        agents.add(ExternalAgent())
-
-        arbiter = createArbiter(game?.domain!!)
-        arbiter?.step()
-    }
-
-    private fun createArbiter(domain: Domain) : Arbiter<*, *> {
-        val arbiter = when (domain.type) {
-            DomainType.HEX -> {
-                val simulator = HexSimulator.create(8, true)
-                Arbiter(History(simulator.state), simulator, agents)
-            }
-            DomainType.HAVANNAH -> {
-                val simulator = HavannahSimulator.create(5, true)
-                Arbiter(History(simulator.state), simulator, agents)
-            }
-        }
-        arbiter.listener = {
-            // update board view
-            val state = arbiter.world.state as HexState
-            //hexView!!.setLocationColor()
-            // go to next step
-            if (!arbiter.world.isTerminalState) {
-                arbiter.step()
-            }
-        }
-        return arbiter
+        presenter = GamePresenter(view = this,
+                resourceManager = DefaultResourceManager(activity),
+                navigationManager = DefaultNavigationManager(activity),
+                game = game)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -93,15 +63,7 @@ class GameFragment : Fragment() {
         hexView?.touchListener = { x, y, mv ->
             when (mv.action) {
                 MotionEvent.ACTION_UP -> {
-                    for (i in 0..arbiter!!.world.nAgents - 1) {
-                        val action = HexAction.valueOf(x, y)
-                        if (action in arbiter!!.world.legalActions[i]) {
-                            val agent = agents[i] as ExternalAgent
-                            agent.setAction(action)
-                            hexView!!.setLocationColor(x, y, i + 1)
-                        }
-                        break
-                    }
+                    presenter?.onAction(x, y)
                 }
             }
         }
@@ -110,9 +72,9 @@ class GameFragment : Fragment() {
         return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        activity.actionBar?.title = resources.getString(game?.domain?.type?.nameRes!!)
+    override fun onStart() {
+        super.onStart()
+        presenter?.onShow()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -124,7 +86,7 @@ class GameFragment : Fragment() {
                 true
             }
             R.id.action_about -> {
-                startActivity(Intent(Intent.ACTION_VIEW, helpUri))
+                presenter?.onAboutSelected()
                 true
             }
             else -> {
@@ -135,6 +97,14 @@ class GameFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putSerializable(ARG_GAME, game)
+        outState.putSerializable(ARG_GAME, presenter?.game)
+    }
+
+    override fun setTitle(title: String) {
+        activity.actionBar?.title = title
+    }
+
+    override fun updateState(x: Int, y: Int, player: Int) {
+        hexView?.setLocationColor(x, y, player)
     }
 }
