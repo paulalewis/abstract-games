@@ -82,18 +82,22 @@ private fun computeEdgeSide(p0x: Double, p0y: Double, p1x: Double, p1y: Double, 
  * @vertices vertex points of a polygon V[n+1] with V[n]=V[0]
  * @return 0 = outside, 1 = inside
  */
-fun crossingNumberTest(point: Point, vertices: List<Point>): Int {
+fun crossingNumberTest(pointX: Double, pointY: Double, vertices: DoubleArray): Int {
+    if (vertices.size % 2 == 1) {
+        throw IllegalArgumentException("Vertices array must have even number of values")
+    }
     var crossingNumber: Int = 0
-
     // loop through all edges of the polygon
-    for (i in 0..vertices.size - 1) {
-        val vi = vertices[i]
-        val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
-        if (((vi.y <= point.y) && (vf.y > point.y)) // an upward crossing
-                || ((vi.y > point.y) && (vf.y <= point.y))) { // a downward crossing
+    for (i in 0..vertices.size - 2 step 2) {
+        val vix = vertices[i]
+        val viy = vertices[i + 1]
+        val vfx = vertices[if (i == vertices.size - 2) 0 else i + 2]
+        val vfy = vertices[if (i == vertices.size - 2) 1 else i + 3]
+        if (((viy <= pointY) && (vfy > pointY)) // an upward crossing
+                || ((viy > pointY) && (vfy <= pointY))) { // a downward crossing
             // compute  the actual edge-ray intersect x-coordinate
-            val vt: Float = (point.y - vi.y) / (vf.y - vi.y).toFloat()
-            if (point.x < vi.x + vt * (vf.x - vi.x)) // P.x < intersect
+            val vt = (pointY - viy) / (vfy - viy)
+            if (pointX < vix + vt * (vfx - vix)) // P.x < intersect
                 crossingNumber += 1 // a valid crossing of y=P.y right of P.x
         }
     }
