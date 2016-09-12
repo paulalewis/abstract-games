@@ -87,7 +87,7 @@ class HexGridView : View {
             for (i in 0..size - 1) {
                 for (j in 0..size - 1) {
                     val point = locations[i][j]
-                    if (windingNumberTest(mv.x, mv.y, getHexPoints(point.x, point.y)) != 0) {
+                    if (windingNumberTest(mv.x.toDouble(), mv.y.toDouble(), getHexVertices(point.x.toDouble(), point.y.toDouble(), hexagonRadius.toDouble())) != 0) {
                         touchListener(i, j, mv)
                         return true
                     }
@@ -163,24 +163,6 @@ class HexGridView : View {
     fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
         locationColors[x][y] = colorIndex.toByte()
         invalidate()
-    }
-
-    private fun getHexPoints(pointX: Float, pointY: Float): Array<Float> {
-        val hexPoints = Array(12, { 0f })
-        val xOffset = Math.sqrt((hexagonRadius * hexagonRadius - hexagonCRadius * hexagonCRadius).toDouble()).toFloat()
-        hexPoints[0] = pointX - hexagonRadius
-        hexPoints[1] = pointY
-        hexPoints[2] = pointX - xOffset
-        hexPoints[3] = pointY - hexagonCRadius
-        hexPoints[4] = pointX + xOffset
-        hexPoints[5] = pointY - hexagonCRadius
-        hexPoints[6] = pointX + hexagonRadius
-        hexPoints[7] = pointY
-        hexPoints[8] = pointX + xOffset
-        hexPoints[9] = pointY + hexagonCRadius
-        hexPoints[10] = pointX - xOffset
-        hexPoints[11] = pointY + hexagonCRadius
-        return hexPoints
     }
 
 }

@@ -6,6 +6,8 @@ val HEXAGON_RADIUS = 1f
 val HEXAGON_HALF_RADIUS = HEXAGON_RADIUS * 0.5f
 val HEXAGON_SHORT_RADIUS = HEXAGON_HALF_RADIUS * Math.sqrt(3.0).toFloat()
 
+private val HEXAGON_INSCRIBED_RADIUS_MULTIPLIER = Math.sqrt(3.0) / 2
+
 /**
  * @param radius of the circumscribed circle
  * @return a Path object in the shape of a hexagon
@@ -37,18 +39,41 @@ fun getRegularPolygon(nSides: Int, radius: Float): Path {
     return path
 }
 
+fun getHexVertices(pointX: Double,
+                   pointY: Double,
+                   circumscribedRadius: Double): DoubleArray {
+    val inscribedRadius = computeHexagonInscribedRadius(circumscribedRadius)
+    val xOffset = Math.sqrt(circumscribedRadius * circumscribedRadius - inscribedRadius * inscribedRadius)
+    return doubleArrayOf(
+            pointX - circumscribedRadius, pointY,
+            pointX - xOffset, pointY - inscribedRadius,
+            pointX + xOffset, pointY - inscribedRadius,
+            pointX + circumscribedRadius, pointY,
+            pointX + xOffset, pointY + inscribedRadius,
+            pointX - xOffset, pointY + inscribedRadius
+    )
+}
+
+private fun computeHexagonInscribedRadius(circumscribedRadius: Double): Double {
+    return circumscribedRadius * HEXAGON_INSCRIBED_RADIUS_MULTIPLIER
+}
+
+private fun isLeftOfEdge(p0x: Double, p0y: Double, p1x: Double, p1y: Double, p2x: Double, p2y: Double): Boolean {
+    return computeEdgeSide(p0x, p0y, p1x, p1y, p2x, p2y) > 0
+}
+
+private fun isRightOfEdge(p0x: Double, p0y: Double, p1x: Double, p1y: Double, p2x: Double, p2y: Double): Boolean {
+    return computeEdgeSide(p0x, p0y, p1x, p1y, p2x, p2y) < 0
+}
+
 /**
  * tests if a point is Left|On|Right of an infinite line
  * @return >0 for p2 left of the line through p0 and p1
  *         =0 for p2 on the line
  *         <0 for p2 right of the line
  */
-private fun isLeftOfEdge(p0x: Float, p0y: Float, p1x: Float, p1y: Float, p2x: Float, p2y: Float): Boolean {
-    return ((p1x - p0x) * (p2y - p0y) - (p2x - p0x) * (p1y - p0y)) > 0
-}
-
-private fun isRightOfEdge(p0x: Float, p0y: Float, p1x: Float, p1y: Float, p2x: Float, p2y: Float): Boolean {
-    return ((p1x - p0x) * (p2y - p0y) - (p2x -  p0x) * (p1y - p0y)) < 0
+private fun computeEdgeSide(p0x: Double, p0y: Double, p1x: Double, p1y: Double, p2x: Double, p2y: Double): Double {
+    return (p1x - p0x) * (p2y - p0y) - (p2x - p0x) * (p1y - p0y)
 }
 
 /**
@@ -65,9 +90,9 @@ fun crossingNumberTest(point: Point, vertices: List<Point>): Int {
         val vi = vertices[i]
         val vf = vertices[if (i == vertices.size - 1) 0 else i + 1]
         if (((vi.y <= point.y) && (vf.y > point.y)) // an upward crossing
-                || ((vi.y > point.y) && (vf.y <=  point.y))) { // a downward crossing
+                || ((vi.y > point.y) && (vf.y <= point.y))) { // a downward crossing
             // compute  the actual edge-ray intersect x-coordinate
-            val vt: Float = (point.y  - vi.y) / (vf.y - vi.y).toFloat()
+            val vt: Float = (point.y - vi.y) / (vf.y - vi.y).toFloat()
             if (point.x < vi.x + vt * (vf.x - vi.x)) // P.x < intersect
                 crossingNumber += 1 // a valid crossing of y=P.y right of P.x
         }
@@ -82,7 +107,7 @@ fun crossingNumberTest(point: Point, vertices: List<Point>): Int {
  * @param vertices the vertices of the polygon in (x,y) coordinate pairs
  * @return the winding number, is 0 when point is outside polygon
  */
-fun windingNumberTest(pointX: Float, pointY: Float, vertices: Array<Float>): Int {
+fun windingNumberTest(pointX: Double, pointY: Double, vertices: DoubleArray): Int {
     if (vertices.size % 2 == 1) {
         throw IllegalArgumentException("Vertices array must have even number of values")
     }
@@ -94,11 +119,11 @@ fun windingNumberTest(pointX: Float, pointY: Float, vertices: Array<Float>): Int
         val vfx = vertices[if (i == vertices.size - 2) 0 else i + 2]
         val vfy = vertices[if (i == vertices.size - 2) 1 else i + 3]
         if (viy <= pointY) { // start y <= P.y
-            if (vfy  > pointY) // an upward crossing
+            if (vfy > pointY) // an upward crossing
                 if (isLeftOfEdge(vix, viy, vfx, vfy, pointX, pointY))
                     windingNumber += 1 // have  a valid up intersect
         } else { // start y > P.y (no test needed)
-            if (vfy  <= pointY)     // a downward crossing
+            if (vfy <= pointY)     // a downward crossing
                 if (isRightOfEdge(vix, viy, vfx, vfy, pointX, pointY))
                     windingNumber -= 1 // have  a valid down intersect
         }
