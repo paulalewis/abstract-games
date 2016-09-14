@@ -56,7 +56,7 @@ class GameFragment : Fragment(), GameView {
 
         // TODO - change look base on game
         hexView = HexGridView(activity)
-        hexView?.size = 5
+        hexView?.size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
         hexView?.boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
         hexView?.paletteColors?.put(1, Color.RED)
         hexView?.paletteColors?.put(2, Color.BLUE)

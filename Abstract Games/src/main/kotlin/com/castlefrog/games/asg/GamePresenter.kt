@@ -55,17 +55,21 @@ class GamePresenter(val view: GameView,
     private fun createArbiter(domain: Domain) : Arbiter<*, *> {
         val arbiter = when (domain.type) {
             DomainType.HEX -> {
-                val simulator = HexSimulator.create(8, true)
+                val size = domain.params["size"]!!.toInt()
+                val pieRule = domain.params["pieRule"]!!.toBoolean()
+                val simulator = HexSimulator.create(size, pieRule)
                 Arbiter(History(simulator.state), simulator, agents)
             }
             DomainType.HAVANNAH -> {
-                val simulator = HavannahSimulator.create(5, true)
+                val size = domain.params["size"]!!.toInt()
+                val pieRule = domain.params["pieRule"]!!.toBoolean()
+                val simulator = HavannahSimulator.create(size, pieRule)
                 Arbiter(History(simulator.state), simulator, agents)
             }
         }
         arbiter.listener = {
             // update board view
-            val state = arbiter.world.state as HexState
+            //val state = arbiter.world.state as HexState
             //hexView!!.setLocationColor()
             // go to next step
             if (!arbiter.world.isTerminalState) {
