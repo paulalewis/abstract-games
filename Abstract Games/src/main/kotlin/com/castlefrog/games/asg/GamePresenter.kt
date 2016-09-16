@@ -14,21 +14,16 @@ import com.castlefrog.games.asg.model.Game
 import java.util.*
 
 class GamePresenter(val view: GameView,
-                    val resourceManager: ResourceManager,
-                    val navigationManager: NavigationManager,
                     val game: Game) {
 
     private val arbiter: Arbiter<*, *>
     private val agents: MutableList<Agent> = ArrayList()
-    private val helpUri: String
 
     init {
         // TODO - dynamically set agents
         agents.add(ExternalAgent())
         agents.add(ExternalAgent())
         arbiter = createArbiter(game.domain)
-        val resId = resourceManager.getStringIdentifier("help_uri_" + resourceManager.getLocalizedString(game.domain.type.nameRes).toLowerCase())
-        helpUri = resourceManager.getLocalizedString(resId)
         arbiter.step()
     }
 
@@ -45,11 +40,11 @@ class GamePresenter(val view: GameView,
     }
 
     fun onShow() {
-        view.setTitle(resourceManager.getLocalizedString(game.domain.type.nameRes))
+        view.setTitle(game.domain.type)
     }
 
     fun onAboutSelected() {
-        navigationManager.navigate(helpUri)
+        view.navigateToHelp(game.domain.type)
     }
 
     private fun createArbiter(domain: Domain) : Arbiter<*, *> {

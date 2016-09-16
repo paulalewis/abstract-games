@@ -45,8 +45,6 @@ class GameFragment : Fragment(), GameView {
         setHasOptionsMenu(true)
 
         presenter = GamePresenter(view = this,
-                resourceManager = DefaultResourceManager(activity),
-                navigationManager = DefaultNavigationManager(activity),
                 game = game)
     }
 
@@ -100,8 +98,15 @@ class GameFragment : Fragment(), GameView {
         outState.putSerializable(ARG_GAME, presenter?.game)
     }
 
-    override fun setTitle(title: String) {
-        activity.actionBar?.title = title
+    override fun setTitle(domainType: DomainType) {
+        activity.actionBar?.title = resources.getString(domainType.nameRes)
+    }
+
+    override fun navigateToHelp(domainType: DomainType) {
+        val resName = resources.getString(domainType.nameRes).toLowerCase()
+        val resId = resources.getIdentifier("help_uri_" + resName, "string", activity.packageName)
+        val helpUri = resources.getString(resId)
+        activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(helpUri)))
     }
 
     override fun updateState(x: Int, y: Int, player: Int) {
