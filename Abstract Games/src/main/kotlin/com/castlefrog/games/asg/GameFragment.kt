@@ -44,8 +44,12 @@ class GameFragment : Fragment(), GameView {
         val game = bundle.getSerializable(ARG_GAME) as Game
         setHasOptionsMenu(true)
 
+        val agents = ArrayList<Agent>()
+        agents.add(ExternalAgent())
+        agents.add(ExternalAgent())
         presenter = GamePresenter(view = this,
-                game = game)
+                game = game,
+                agents = agents)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

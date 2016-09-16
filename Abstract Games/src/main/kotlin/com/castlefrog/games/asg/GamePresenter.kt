@@ -11,18 +11,14 @@ import com.castlefrog.agl.domains.hex.HexState
 import com.castlefrog.games.asg.model.Domain
 import com.castlefrog.games.asg.model.DomainType
 import com.castlefrog.games.asg.model.Game
-import java.util.*
 
 class GamePresenter(val view: GameView,
-                    val game: Game) {
+                    val game: Game,
+                    val agents: List<Agent>) {
 
     private val arbiter: Arbiter<*, *>
-    private val agents: MutableList<Agent> = ArrayList()
 
     init {
-        // TODO - dynamically set agents
-        agents.add(ExternalAgent())
-        agents.add(ExternalAgent())
         arbiter = createArbiter(game.domain)
         arbiter.step()
     }
