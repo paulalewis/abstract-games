@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="help_uri_hex">https://de.wikipedia.org/wiki/Hex_(Spiel)</string>
+    <string name="help_uri_havannah">https://de.wikipedia.org/wiki/Havannah</string>
+
+</resources>

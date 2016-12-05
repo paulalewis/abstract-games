@@ -4,8 +4,6 @@
     <string name="app_name">Abstract Games</string>
     <string name="hex">Hex</string>
     <string name="havannah">Havannah</string>
-    <string name="help_uri_hex">http://en.wikipedia.org/wiki/Hex_(board_game)</string>
-    <string name="help_uri_havannah">http://en.wikipedia.org/wiki/Havannah</string>
 
     <!-- Menu Items -->
     <string name="action_undo_move">Undo Move</string>
