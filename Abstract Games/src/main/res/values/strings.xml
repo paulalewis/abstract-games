@@ -6,8 +6,6 @@
     <string name="havannah">Havannah</string>
 
     <!-- Menu Items -->
-    <string name="action_undo_move">Undo Move</string>
-    <string name="action_redo_move">Redo Move</string>
     <string name="action_about">About</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>

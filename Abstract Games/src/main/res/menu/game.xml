@@ -2,22 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.castlefrog.games.asg.MainActivity">
 
-    <item android:id="@+id/action_undo_move"
-        android:title="@string/action_undo_move"
-        android:orderInCategory="10"
-        android:icon="@drawable/ic_undo"
-        android:showAsAction="ifRoom"/>
-
-    <item android:id="@+id/action_redo_move"
-        android:title="@string/action_redo_move"
-        android:orderInCategory="11"
-        android:icon="@drawable/ic_redo"
-        android:showAsAction="ifRoom"/>
-
     <item android:id="@+id/action_about"
         android:title="@string/action_about"
         android:orderInCategory="12"
         android:icon="@drawable/ic_info"
-        android:showAsAction="ifRoom"/>
+        android:showAsAction="always"/>
 
 </menu>
