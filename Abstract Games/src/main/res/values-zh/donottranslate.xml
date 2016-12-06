@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="help_uri_hex">https://zh.wikipedia.org/wiki/%E5%85%AD%E8%B2%AB%E6%A3%8B</string>
-    <string name="help_uri_havannah">https://zh.wikipedia.org/wiki/%E4%B8%89%E5%AF%B6%E6%A3%8B</string>
+    <string formatted="false" name="help_uri_hex">https://zh.wikipedia.org/wiki/%E5%85%AD%E8%B2%AB%E6%A3%8B</string>
+    <string formatted="false" name="help_uri_havannah">https://zh.wikipedia.org/wiki/%E4%B8%89%E5%AF%B6%E6%A3%8B</string>
 
 </resources>
