@@ -51,15 +51,31 @@ class HexFragment : Fragment(), HexView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         return UI {
-            linearLayout {
+            verticalLayout {
                 toolbar {
                     title = resources.getString(R.string.hex)
+                    lparams(width = matchParent, height = wrapContent)
+                    background = context.getDrawable(R.color.primary)
+                    inflateMenu(R.menu.game)
+                    setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.action_about -> {
+                                activity.startActivity(Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(resources.getString(R.string.help_uri_hex))))
+                                true
+                            }
+                            else -> {
+                                super.onOptionsItemSelected(item)
+                            }
+                        }
+                    }
                 }
                 hexView = hexGridView {
+                    padding = resources.getDimensionPixelSize(R.dimen.game_margin)
                     size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
                     boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
-                    paletteColors.put(1, Color.RED)
-                    paletteColors.put(2, Color.BLUE)
+                    paletteColors.put(1, Color.BLACK)
+                    paletteColors.put(2, Color.WHITE)
                     touchListener = { x, y, mv ->
                         when (mv.action) {
                             MotionEvent.ACTION_UP -> {
@@ -70,19 +86,6 @@ class HexFragment : Fragment(), HexView {
                 }
             }
         }.view
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_about -> {
-                activity.startActivity(Intent(Intent.ACTION_VIEW,
-                        Uri.parse(resources.getString(R.string.help_uri_hex))))
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -11,9 +11,7 @@ import com.castlefrog.agl.agents.RandomAgent
 import com.castlefrog.games.asg.R
 import com.castlefrog.games.asg.hexGridView
 import com.castlefrog.games.asg.model.Game
-import org.jetbrains.anko.UI
-import org.jetbrains.anko.linearLayout
-import org.jetbrains.anko.toolbar
+import org.jetbrains.anko.*
 import java.util.*
 
 class HavannahFragment : Fragment(), HavannahView {
@@ -49,11 +47,27 @@ class HavannahFragment : Fragment(), HavannahView {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return UI {
-            linearLayout {
+            verticalLayout {
                 toolbar {
                     title = resources.getString(R.string.havannah)
+                    lparams(width = matchParent, height = wrapContent)
+                    background = context.getDrawable(R.color.primary)
+                    inflateMenu(R.menu.game)
+                    setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            R.id.action_about -> {
+                                activity.startActivity(Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(resources.getString(R.string.help_uri_havannah))))
+                                true
+                            }
+                            else -> {
+                                super.onOptionsItemSelected(item)
+                            }
+                        }
+                    }
                 }
                 hexGridView {
+                    padding = resources.getDimensionPixelSize(R.dimen.game_margin)
                     size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
                     boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
                     paletteColors.put(1, Color.RED)
@@ -68,19 +82,6 @@ class HavannahFragment : Fragment(), HavannahView {
                 }
             }
         }.view
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_about -> {
-                activity.startActivity(Intent(Intent.ACTION_VIEW,
-                        Uri.parse(resources.getString(R.string.help_uri_havannah))))
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

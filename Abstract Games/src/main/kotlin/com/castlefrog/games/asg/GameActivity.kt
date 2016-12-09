@@ -26,8 +26,6 @@ class GameActivity : Activity() {
         super.onCreate(savedInstanceState)
         frameLayout {
             id = R.id.container
-            horizontalPadding = resources.getDimensionPixelSize(R.dimen.activity_horizontal_margin)
-            verticalPadding = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
             background = context.getDrawable(android.R.color.black)
         }
         val extras = intent.extras
