@@ -7,7 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import java.util.*
 
-class HavannahView : View {
+class HavannahGridView : View {
 
     companion object {
         private val DEFAULT_BOARD_SIZE = 5
