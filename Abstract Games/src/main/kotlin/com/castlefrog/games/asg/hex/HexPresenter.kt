@@ -21,7 +21,8 @@ class HexPresenter(val view: HexView,
     init {
         arbiter = createArbiter(game.domain)
         arbiter.stateChange.subscribe({ state ->
-            view.updateBoard(state.locations.map { it.map { it } })
+            view.clearBoard()
+            //view.updateBoard(state.locations.map { it.map { it } })
         })
     }
 
@@ -29,6 +30,7 @@ class HexPresenter(val view: HexView,
         for (i in 0..arbiter.world.nAgents - 1) {
             val action = HexAction.valueOf(x, y)
             if (action in arbiter.world.legalActions[i]) {
+                view.setHex(x, y, i + 1)
                 //val agent = agents[i] as ExternalAgent
                 //agent.setAction(action)
             }

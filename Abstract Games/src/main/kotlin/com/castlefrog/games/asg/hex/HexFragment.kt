@@ -55,7 +55,7 @@ class HexFragment : Fragment(), HexView {
                 toolbar {
                     title = resources.getString(R.string.hex)
                 }
-                hexGridView {
+                hexView = hexGridView {
                     size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
                     boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
                     paletteColors.put(1, Color.RED)
@@ -90,12 +90,26 @@ class HexFragment : Fragment(), HexView {
         outState.putSerializable(ARG_GAME, presenter?.game)
     }
 
-    override fun updateBoard(locations: List<List<Byte>>) {
+    override fun clearBoard() {
+        val size = hexView?.size ?: 0
+        for (i in 0..size - 1) {
+            for (j in 0..size - 1) {
+                hexView?.setLocationColor(i, j, 0)
+            }
+        }
+    }
+
+    override fun setHex(x: Int, y: Int, player: Int) {
+        hexView?.setLocationColor(x, y, player)
+    }
+
+
+    /*override fun updateBoard(locations: List<List<Byte>>) {
         for (i in 0..locations.size - 1) {
             for (j in 0..locations[i].size - 1) {
                 hexView?.setLocationColor(i, j, locations[i][j].toInt())
             }
         }
-    }
+    }*/
 
 }
