@@ -5,6 +5,8 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewManager
+import org.jetbrains.anko.custom.ankoView
 import java.util.ArrayList
 import java.util.HashMap
 
@@ -166,3 +168,6 @@ class HexGridView : View {
     }
 
 }
+
+//inline fun ViewManager.hexGridView(theme: Int = 0) = hexGridView(theme) {}
+inline fun ViewManager.hexGridView(init: HexGridView.() -> Unit) = ankoView({ HexGridView(it) }, init)

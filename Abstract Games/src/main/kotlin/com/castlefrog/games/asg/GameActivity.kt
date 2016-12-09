@@ -30,7 +30,7 @@ class GameActivity : Activity() {
             verticalPadding = resources.getDimensionPixelSize(R.dimen.activity_vertical_margin)
             background = context.getDrawable(android.R.color.black)
         }
-        val extras = savedInstanceState ?: intent.extras
+        val extras = intent.extras
         val game : Game = extras.getSerializable(ARG_GAME) as Game
         val fragment = when (game.domain.type) {
             DomainType.HEX -> HexFragment.newInstance(game)
