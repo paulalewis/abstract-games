@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "527135571290",
+    "firebase_url": "https://gothic-isotope-689.firebaseio.com",
+    "project_id": "gothic-isotope-689",
+    "storage_bucket": "gothic-isotope-689.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527135571290:android:4fc5595b97ad9044",
+        "android_client_info": {
+          "package_name": "com.castlefrog.games.asg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527135571290-ebj6pr36sgh4mfeol08juj1i9cjh9mu3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtM4C3uVcdAdHfuEMnsbUUYiPX_IAkL-A"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
