@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import com.castlefrog.agl.Agent
 import com.castlefrog.agl.agents.RandomAgent
+import com.castlefrog.games.asg.HexGridView.Companion.HEX_HIDDEN
 import com.castlefrog.games.asg.R
 import com.castlefrog.games.asg.hexGridView
 import com.castlefrog.games.asg.model.Game
@@ -72,8 +73,8 @@ class HavannahFragment : Fragment(), HavannahView {
                     boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
                     paletteColors.put(1, Color.RED)
                     paletteColors.put(2, Color.BLUE)
-                    touchListener = { x, y, mv ->
-                        when (mv.action) {
+                    touchListener = { x, y, me ->
+                        when (me.action) {
                             MotionEvent.ACTION_UP -> {
                                 presenter?.onAction(x, y)
                             }

@@ -77,8 +77,8 @@ class HexFragment : Fragment(), HexView {
                     boardOutlineColor = context.getColor(R.color.hexBoardOutline)
                     paletteColors.put(1, player1Color)
                     paletteColors.put(2, player2Color)
-                    touchListener = { x, y, mv ->
-                        when (mv.action) {
+                    touchListener = { x, y, me ->
+                        when (me.action) {
                             MotionEvent.ACTION_UP -> {
                                 presenter?.onAction(x, y)
                             }

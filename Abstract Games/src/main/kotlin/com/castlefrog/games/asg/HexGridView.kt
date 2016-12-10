@@ -17,6 +17,7 @@ class HexGridView : View {
         private val DEFAULT_LINE_WIDTH_RATIO = 0.1f
         private val DEFAULT_OUTLINE_COLOR = Color.WHITE
         private val DEFAULT_BACKGROUND_COLOR = Color.GRAY
+        val HEX_HIDDEN: Byte = -1
     }
 
     /** Size of the hex grid */
@@ -48,8 +49,7 @@ class HexGridView : View {
     val paletteColors: MutableMap<Byte, Int> = HashMap()
     var boardOutlineColor: Int = DEFAULT_OUTLINE_COLOR
     var boardBackgroundColor: Int = DEFAULT_BACKGROUND_COLOR
-
-    var touchListener: (x: Int, y: Int, mv: MotionEvent) -> Unit = { x, y, mv -> }
+    var touchListener: (x: Int, y: Int, me: MotionEvent) -> Unit = { x, y, me -> }
 
     private val locations: MutableList<List<PointF>> = ArrayList()
     private var hexagon = Path()
@@ -142,26 +142,31 @@ class HexGridView : View {
         paint.style = Paint.Style.FILL
         for (i in 0..size - 1) {
             for (j in 0..size - 1) {
-                paint.color = paletteColors[locationColors[i][j]] ?: boardBackgroundColor
-                val point = locations[i][j]
-                drawMatrix.reset()
-                drawMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                drawPath.reset()
-                hexagon.transform(drawMatrix, drawPath)
-                canvas.drawPath(drawPath, paint)
+                if (locationColors[i][j] != HEX_HIDDEN) {
+                    paint.color = paletteColors[locationColors[i][j]] ?: boardBackgroundColor
+                    val point = locations[i][j]
+                    drawMatrix.reset()
+                    drawMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                    drawPath.reset()
+                    hexagon.transform(drawMatrix, drawPath)
+                    canvas.drawPath(drawPath, paint)
+                }
             }
         }
         // draw board inner edges
         paint.style = Paint.Style.STROKE
         paint.color = boardOutlineColor
         paint.strokeWidth = lineWidth
-        for (row in locations) {
-            for (point in row) {
-                drawMatrix.reset()
-                drawMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
-                drawPath.reset()
-                hexagon.transform(drawMatrix, drawPath)
-                canvas.drawPath(drawPath, paint)
+        for (i in 0..size - 1) {
+            for (j in 0..size - 1) {
+                if (locationColors[i][j] != HEX_HIDDEN) {
+                    val point = locations[i][j]
+                    drawMatrix.reset()
+                    drawMatrix.postTranslate(point.x - hexagonRadius, point.y - hexagonCRadius)
+                    drawPath.reset()
+                    hexagon.transform(drawMatrix, drawPath)
+                    canvas.drawPath(drawPath, paint)
+                }
             }
         }
     }
