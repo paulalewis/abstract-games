@@ -73,7 +73,8 @@ class HexFragment : Fragment(), HexView {
                 hexView = hexGridView {
                     padding = resources.getDimensionPixelSize(R.dimen.game_margin)
                     size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
-                    boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
+                    boardBackgroundColor = context.getColor(R.color.hexBoardBackground)
+                    boardOutlineColor = context.getColor(R.color.hexBoardOutline)
                     paletteColors.put(1, player1Color)
                     paletteColors.put(2, player2Color)
                     touchListener = { x, y, mv ->

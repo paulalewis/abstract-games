@@ -81,6 +81,8 @@ class HexGridView : View {
         boardBackgroundColor = a.getColor(R.styleable.HexGridView_boardBackgroundColor, boardBackgroundColor)
         boardOutlineColor = a.getColor(R.styleable.HexGridView_boardOutlineColor, boardOutlineColor)
 
+        paint.isAntiAlias = true
+
         a.recycle()
     }
 
