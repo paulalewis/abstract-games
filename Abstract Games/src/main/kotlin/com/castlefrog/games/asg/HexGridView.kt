@@ -20,7 +20,7 @@ class HexGridView : View {
         val HEX_HIDDEN: Byte = -1
     }
 
-    /** Size of the hex grid */
+    /** size of the hex grid */
     var size: Int = MIN_SIZE
         set(value) {
             if (size != value) {
@@ -38,23 +38,28 @@ class HexGridView : View {
             }
         }
 
-    /** Ratio of line width to hex width. Must be value between 0 and 1 */
+    /** ratio of line width to hex width */
     var lineWidthRatio: Float = DEFAULT_LINE_WIDTH_RATIO
         set(value) {
-            lineWidthRatio = if (value >= 0 && value <= 1) value else lineWidthRatio
+            lineWidthRatio = when {
+                value < 0 -> 0f
+                value > 1 -> 1f
+                else -> value
+            }
             invalidate()
         }
 
-    var locationColors: Array<ByteArray> = Array(size, { ByteArray(size) })
     val paletteColors: MutableMap<Byte, Int> = HashMap()
     var boardOutlineColor: Int = DEFAULT_OUTLINE_COLOR
     var boardBackgroundColor: Int = DEFAULT_BACKGROUND_COLOR
     var touchListener: (x: Int, y: Int, me: MotionEvent) -> Unit = { x, y, me -> }
 
+    private var locationColors: Array<ByteArray> = Array(size, { ByteArray(size) })
     private val locations: MutableList<List<PointF>> = ArrayList()
     private var hexagon = Path()
-    /** distance from center to corner  */
+    /** distance from center to corner */
     private var hexagonRadius = 0f
+    /** distance from center to edge */
     private var hexagonCRadius = 0f
 
     private val paint = Paint()
@@ -173,6 +178,21 @@ class HexGridView : View {
 
     fun setLocationColor(x: Int, y: Int, colorIndex: Int) {
         locationColors[x][y] = colorIndex.toByte()
+        invalidate()
+    }
+
+    fun setLocationsColor(locations: List<Pair<Int, Int>>, colorIndex: Int) {
+        locations.forEach { pair -> locationColors[pair.first][pair.second] = colorIndex.toByte() }
+        invalidate()
+    }
+
+    fun setLocationHidden(x: Int, y: Int) {
+        locationColors[x][y] = HEX_HIDDEN
+        invalidate()
+    }
+
+    fun setLocationsHidden(locations: List<Pair<Int, Int>>) {
+        locations.forEach { pair -> locationColors[pair.first][pair.second] = HEX_HIDDEN }
         invalidate()
     }
 
