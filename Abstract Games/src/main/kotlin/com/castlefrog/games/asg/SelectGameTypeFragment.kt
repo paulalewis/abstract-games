@@ -31,7 +31,7 @@ class SelectGameTypeFragment : DialogFragment() {
         hexIconView.boardBackgroundColor = Color.GRAY
         val hexDomainParams = HashMap<String, String>()
         hexDomainParams.put("size", "6")
-        hexDomainParams.put("pieRule", "false")
+        hexDomainParams.put("pieRule", "true")
         val hexDomain = Domain(DomainType.HEX, hexDomainParams)
         contents.add(Pair<Domain, View>(hexDomain, hexIconView))
         val havannahIconView = HexGridView(activity)
@@ -39,7 +39,7 @@ class SelectGameTypeFragment : DialogFragment() {
         havannahIconView.boardBackgroundColor = Color.GRAY
         val havannahDomainParams = HashMap<String, String>()
         havannahDomainParams.put("size", "6")
-        havannahDomainParams.put("pieRule", "false")
+        havannahDomainParams.put("pieRule", "true")
         val havannahDomain = Domain(DomainType.HAVANNAH, havannahDomainParams)
         contents.add(Pair<Domain, View>(havannahDomain, havannahIconView))
     }

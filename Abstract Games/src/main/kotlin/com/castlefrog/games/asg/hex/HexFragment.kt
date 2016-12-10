@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.*
 import com.castlefrog.agl.Agent
 import com.castlefrog.agl.agents.RandomAgent
+import com.castlefrog.agl.domains.hex.HexState
 import com.castlefrog.games.asg.HexGridView
 import com.castlefrog.games.asg.R
 import com.castlefrog.games.asg.hexGridView
@@ -32,6 +33,8 @@ class HexFragment : Fragment(), HexView {
 
     private var presenter: HexPresenter? = null
     private var hexView: HexGridView? = null
+    private var player1Color = Color.BLACK
+    private var player2Color = Color.WHITE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,10 +45,7 @@ class HexFragment : Fragment(), HexView {
         val agents = ArrayList<Agent>()
         agents.add(RandomAgent())
         agents.add(RandomAgent())
-        presenter = HexPresenter(view = this,
-                game = game,
-                agents = agents)
-
+        presenter = HexPresenter(view = this, game = game)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -74,8 +74,8 @@ class HexFragment : Fragment(), HexView {
                     padding = resources.getDimensionPixelSize(R.dimen.game_margin)
                     size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
                     boardBackgroundColor = resources.getColor(android.R.color.darker_gray, null)
-                    paletteColors.put(1, Color.BLACK)
-                    paletteColors.put(2, Color.WHITE)
+                    paletteColors.put(1, player1Color)
+                    paletteColors.put(2, player2Color)
                     touchListener = { x, y, mv ->
                         when (mv.action) {
                             MotionEvent.ACTION_UP -> {
@@ -93,26 +93,12 @@ class HexFragment : Fragment(), HexView {
         outState.putSerializable(ARG_GAME, presenter?.game)
     }
 
-    override fun clearBoard() {
-        val size = hexView?.size ?: 0
-        for (i in 0..size - 1) {
-            for (j in 0..size - 1) {
-                hexView?.setLocationColor(i, j, 0)
+    override fun updateState(state: HexState) {
+        for (i in 0..state.boardSize - 1) {
+            for (j in 0..state.boardSize - 1) {
+                hexView?.setLocationColor(i, j, state.getLocation(i, j))
             }
         }
     }
-
-    override fun setHex(x: Int, y: Int, player: Int) {
-        hexView?.setLocationColor(x, y, player)
-    }
-
-
-    /*override fun updateBoard(locations: List<List<Byte>>) {
-        for (i in 0..locations.size - 1) {
-            for (j in 0..locations[i].size - 1) {
-                hexView?.setLocationColor(i, j, locations[i][j].toInt())
-            }
-        }
-    }*/
 
 }

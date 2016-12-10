@@ -1,11 +1,9 @@
 package com.castlefrog.games.asg.hex
 
+import com.castlefrog.agl.domains.hex.HexState
+
 interface HexView {
 
-    fun clearBoard()
-
-    fun setHex(x: Int, y: Int, player: Int)
-
-    //fun updateBoard(locations: List<List<Byte>>)
+    fun updateState(state: HexState)
 
 }
