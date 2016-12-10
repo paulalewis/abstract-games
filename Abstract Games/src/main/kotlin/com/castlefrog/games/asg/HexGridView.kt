@@ -89,7 +89,9 @@ class HexGridView : View {
             for (i in 0..size - 1) {
                 for (j in 0..size - 1) {
                     val point = locations[i][j]
-                    if (windingNumberTest(mv.x.toDouble(), mv.y.toDouble(), getHexVertices(point.x.toDouble(), point.y.toDouble(), hexagonRadius.toDouble())) != 0) {
+                    if (windingNumberTest(mv.x.toDouble(), mv.y.toDouble(),
+                            getHexVertices(point.x.toDouble(), point.y.toDouble(),
+                                    hexagonRadius.toDouble())) != 0) {
                         touchListener(i, j, mv)
                         return true
                     }
@@ -169,5 +171,4 @@ class HexGridView : View {
 
 }
 
-//inline fun ViewManager.hexGridView(theme: Int = 0) = hexGridView(theme) {}
-inline fun ViewManager.hexGridView(init: HexGridView.() -> Unit) = ankoView({ HexGridView(it) }, init)
+inline fun ViewManager.hexGridView(init: HexGridView.() -> Unit) = ankoView(::HexGridView, init)
