@@ -3,15 +3,15 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 
 ext {
-    supportLibraryVersion = '25.0.1'
+    supportLibraryVersion = '25.2.0'
 }
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 25
         versionCode 12
         versionName "1.2.0"
