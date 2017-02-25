@@ -32,7 +32,7 @@ class HexFragment : Fragment(), HexView {
     }
 
     private var presenter: HexPresenter? = null
-    private var hexView: HexGridView? = null
+    private var hexGridView: HexGridView? = null
     private var player1Color = Color.BLACK
     private var player2Color = Color.WHITE
 
@@ -70,7 +70,7 @@ class HexFragment : Fragment(), HexView {
                         }
                     }
                 }
-                hexView = hexGridView {
+                hexGridView = hexGridView {
                     padding = resources.getDimensionPixelSize(R.dimen.game_margin)
                     size = presenter?.game?.domain!!.params["size"]?.toInt() ?: 0
                     boardBackgroundColor = context.getColor(R.color.hexBoardBackground)
@@ -97,7 +97,7 @@ class HexFragment : Fragment(), HexView {
     override fun updateState(state: HexState) {
         for (i in 0..state.boardSize - 1) {
             for (j in 0..state.boardSize - 1) {
-                hexView?.setLocationColor(i, j, state.getLocation(i, j))
+                hexGridView?.setLocationColor(i, j, state.getLocation(i, j))
             }
         }
     }
