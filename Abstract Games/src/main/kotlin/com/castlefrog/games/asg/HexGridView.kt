@@ -198,4 +198,5 @@ class HexGridView : View {
 
 }
 
-inline fun ViewManager.hexGridView(init: HexGridView.() -> Unit) = ankoView(::HexGridView, init)
+inline fun ViewManager.hexGridView(theme: Int = 0) = hexGridView(theme) {}
+inline fun ViewManager.hexGridView(theme: Int = 0, init: HexGridView.() -> Unit) = ankoView(::HexGridView, theme, init)
