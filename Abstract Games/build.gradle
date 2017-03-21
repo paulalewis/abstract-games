@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 
 ext {
-    supportLibraryVersion = '25.2.0'
+    supportLibraryVersion = '25.3.0'
 }
 
 android {
