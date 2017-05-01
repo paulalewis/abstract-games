@@ -1,6 +1,7 @@
 package com.castlefrog.games.asg
 
-import com.google.common.truth.Truth
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.data.Offset
 import org.junit.Test
 
 class PathUtilsTest {
@@ -8,15 +9,15 @@ class PathUtilsTest {
     @Test
     fun testGetHexagonVertices() {
         val vertices = getHexVertices(0.0, 0.0, 1.0)
-        Truth.assertThat(vertices).hasValuesWithin(0.0001).of(-1.0, 0.0, -0.5, -0.866, 0.5,
-                -0.866, 1.0, 0.0, 0.5, 0.866, -0.5, 0.866)
+        assertThat(vertices).contains(doubleArrayOf(-1.0, 0.0, -0.5, -0.866, 0.5,
+                -0.866, 1.0, 0.0, 0.5, 0.866, -0.5, 0.866), Offset.offset(0.0001))
     }
 
     @Test
     fun testGetHexagonVerticesZeroRadius() {
         val vertices = getHexVertices(1.0, 0.0, 0.0)
-        Truth.assertThat(vertices).hasValuesWithin(0.0001).of(1.0, 0.0, 1.0, 0.0, 1.0,
-                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0)
+        assertThat(vertices).contains(doubleArrayOf(1.0, 0.0, 1.0, 0.0, 1.0,
+                0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0), Offset.offset(0.0001))
     }
 
     @Test
@@ -24,7 +25,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf()
-        Truth.assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test
@@ -32,7 +33,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(0.0, 0.0)
-        Truth.assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -40,7 +41,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(0.0)
-        Truth.assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -48,7 +49,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0)
-        Truth.assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test
@@ -56,7 +57,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0)
-        Truth.assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(1)
+        assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(1)
     }
 
     @Test
@@ -64,7 +65,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0)
-        Truth.assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(1)
+        assertThat(crossingNumberTest(pointX, pointY, path)).isEqualTo(1)
     }
 
     @Test
@@ -72,7 +73,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf()
-        Truth.assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test
@@ -80,7 +81,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(0.0, 0.0)
-        Truth.assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -88,7 +89,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(0.0)
-        Truth.assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -96,7 +97,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0)
-        Truth.assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
+        assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(0)
     }
 
     @Test
@@ -104,7 +105,7 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0)
-        Truth.assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(1)
+        assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(1)
     }
 
     @Test
@@ -112,6 +113,6 @@ class PathUtilsTest {
         val pointX = 0.0
         val pointY = 0.0
         val path = doubleArrayOf(1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0)
-        Truth.assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(-1)
+        assertThat(windingNumberTest(pointX, pointY, path)).isEqualTo(-1)
     }
 }
