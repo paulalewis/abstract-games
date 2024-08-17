@@ -1,10 +1,6 @@
-Abstract Games
-==============
+# Abstract Games
 
-This software is available under the MIT license. See LICENSE.txt.
-
-Design
-------
+## Design
 
 Similar to Gmail email client but for games instead of emails.
 
@@ -17,14 +13,13 @@ updated timestamp
 - You may swipe to delete or archive a game from your "inbox"
 - Can have promotional adds
 
-Features
---------
+## Features
 
-- games are saved after each move (recent games list is populated)
-- completed games list is also available
+- Game state is saved locally
+- List of current games ordered by most important
+- Completed games list is also available
 - user may swipe to delete games
 - games are saved to device and user can return to them at any time
 - user can replay old games
 - user can share games with others to play through
 - user can play against other users
-- user can chat with other players
