@@ -12,15 +12,14 @@ import java.util.*
 class HavannahFragment : Fragment(), HavannahView {
 
     companion object {
-        val ARG_GAME = "game"
-        val ARG_AGENTS = "agents"
+        private const val ARG_GAME = "game"
 
         fun newInstance(game: Game): HavannahFragment {
-            val args = Bundle()
-            args.putSerializable(ARG_GAME, game)
-            val fragment = HavannahFragment()
-            fragment.arguments = args
-            return fragment
+            return HavannahFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(ARG_GAME, game)
+                }
+            }
         }
     }
 
@@ -82,7 +81,7 @@ class HavannahFragment : Fragment(), HavannahView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putSerializable(ARG_GAME, presenter?.game)
+        outState.putParcelable(ARG_GAME, presenter?.game)
     }
 
     override fun updateBoard(locations: List<List<Byte>>) {

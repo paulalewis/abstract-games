@@ -65,6 +65,8 @@ dependencies {
 
     implementation("io.arrow-kt:arrow-core:1.2.1")
 
+    implementation("com.jakewharton.timber:timber:4.6.1")
+
     val moshi = "1.9.2"
     implementation("com.squareup.moshi:moshi:$moshi")
     implementation("com.squareup.moshi:moshi-kotlin:$moshi")

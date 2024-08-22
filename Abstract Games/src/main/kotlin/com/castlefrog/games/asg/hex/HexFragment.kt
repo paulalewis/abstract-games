@@ -15,15 +15,14 @@ import java.util.*
 class HexFragment : Fragment(), HexView {
 
     companion object {
-        val ARG_GAME = "game"
-        val ARG_AGENTS = "agents"
+        private const val ARG_GAME = "game"
 
         fun newInstance(game: Game): HexFragment {
-            val args = Bundle()
-            args.putSerializable(ARG_GAME, game)
-            val fragment = HexFragment()
-            fragment.arguments = args
-            return fragment
+            return HexFragment().apply {
+                arguments = Bundle().apply {
+                    putParcelable(ARG_GAME, game)
+                }
+            }
         }
     }
 
@@ -88,7 +87,7 @@ class HexFragment : Fragment(), HexView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putSerializable(ARG_GAME, presenter?.game)
+        outState.putParcelable(ARG_GAME, presenter?.game)
     }
 
     override fun updateState(state: HexState) {

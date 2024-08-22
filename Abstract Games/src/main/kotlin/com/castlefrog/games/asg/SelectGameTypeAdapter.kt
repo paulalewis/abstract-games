@@ -34,9 +34,9 @@ class SelectGameTypeAdapter(val contents: List<Pair<Domain, View>>, val onItemCl
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val domainName = viewHolder.itemView.resources.getString(contents[position].first.type.nameRes)
-        viewHolder.gameText.text = domainName
-        viewHolder.gameIcon.addView(contents[position].second)
+        // val domainName = viewHolder.itemView.resources.getString(contents[position].first.type.nameRes)
+        // viewHolder.gameText.text = domainName
+        // viewHolder.gameIcon.addView(contents[position].second)
     }
 
     override fun getItemCount(): Int {
