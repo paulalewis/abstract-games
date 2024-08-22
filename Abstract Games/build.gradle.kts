@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-    val compose = "1.6.3"
+    val compose = "1.6.8"
     val retrofit = "2.8.1"
     val moshi = "1.9.2"
     val kotlin = "1.9.20"
@@ -49,12 +49,11 @@ dependencies {
 
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("io.arrow-kt:arrow-core:1.2.1")
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.activity:activity-compose:1.9.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("androidx.compose.ui:ui:$compose")
     implementation("androidx.compose.material:material:$compose")
     implementation("androidx.compose.ui:ui-tooling:$compose")
@@ -68,8 +67,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:$moshi")
     implementation("com.squareup.retrofit2:retrofit:$retrofit")
     implementation("com.squareup.retrofit2:converter-moshi:$retrofit")
-    implementation("com.jakewharton.timber:timber:4.6.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
     implementation("androidx.room:room-runtime:$room")
     annotationProcessor("androidx.room:room-compiler:$room")
