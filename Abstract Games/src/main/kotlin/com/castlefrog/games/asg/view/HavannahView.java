@@ -1,4 +1,4 @@
-package com.castlefrog.games.asg;
+package com.castlefrog.games.asg.view;
 
 import java.util.List;
 import java.util.Vector;
@@ -20,6 +20,9 @@ import com.castlefrog.agl.agents.ExternalAgent;
 import com.castlefrog.agl.domains.havannah.HavannahAction;
 import com.castlefrog.agl.domains.havannah.HavannahState;
 import com.castlefrog.agl.domains.havannah.HavannahSimulator;
+import com.castlefrog.games.asg.GameActivity;
+import com.castlefrog.games.asg.R;
+import com.castlefrog.games.asg.Utils;
 
 public final class HavannahView extends View {
     private static final int WIN_COLOR = 0xffffffff;

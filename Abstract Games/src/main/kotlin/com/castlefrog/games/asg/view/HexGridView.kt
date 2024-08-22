@@ -1,11 +1,15 @@
-package com.castlefrog.games.asg
+package com.castlefrog.games.asg.view
 
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewManager
+import com.castlefrog.games.asg.HEXAGON_SHORT_RADIUS
+import com.castlefrog.games.asg.R
+import com.castlefrog.games.asg.getHexVertices
+import com.castlefrog.games.asg.getHexagon
+import com.castlefrog.games.asg.windingNumberTest
 import java.util.ArrayList
 import java.util.HashMap
 

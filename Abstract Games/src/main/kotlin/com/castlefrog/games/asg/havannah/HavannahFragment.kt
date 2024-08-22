@@ -1,15 +1,10 @@
 package com.castlefrog.games.asg.havannah
 
 import android.app.Fragment
-import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import com.castlefrog.agl.Agent
 import com.castlefrog.agl.agents.RandomAgent
-import com.castlefrog.games.asg.HexGridView.Companion.HEX_HIDDEN
-import com.castlefrog.games.asg.R
 // import com.castlefrog.games.asg.hexGridView
 import com.castlefrog.games.asg.model.Game
 import java.util.*

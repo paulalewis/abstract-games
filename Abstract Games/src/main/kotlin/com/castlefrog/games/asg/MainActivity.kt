@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MainView(
                 newGameClickListener = {
-                    // SelectGameTypeFragment().show(fragmentManager, null)
+                    SelectGameTypeFragment().show(fragmentManager, null)
                 },
                 settingsClickListener = {},
                 onSearchListener = {},

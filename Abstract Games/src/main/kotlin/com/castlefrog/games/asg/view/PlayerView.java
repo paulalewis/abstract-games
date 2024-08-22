@@ -1,4 +1,4 @@
-package com.castlefrog.games.asg;
+package com.castlefrog.games.asg.view;
 
 import android.view.View;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 
 import com.castlefrog.agl.Simulator;
+import com.castlefrog.games.asg.GameActivity;
 
 public final class PlayerView extends View {
     public static final float RING_PADDING = 0.3f;

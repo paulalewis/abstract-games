@@ -1,6 +1,8 @@
 package com.castlefrog.games.asg.model
 
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-data class Game(val name: String, val domain: Domain, val lastMoved: Long) : Serializable
+@Parcelize
+data class Game(val name: String, val domain: Domain, val lastMoved: Long) : Parcelable
 

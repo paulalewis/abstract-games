@@ -1,8 +1,10 @@
 package com.castlefrog.games.asg.model
 
-import com.castlefrog.games.asg.R
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-enum class DomainType(val nameRes: Int) {
-    HEX(R.string.hex),
-    HAVANNAH(R.string.havannah)
+@Parcelize
+enum class DomainType : Parcelable {
+    HEX,
+    HAVANNAH,
 }

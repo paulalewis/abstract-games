@@ -14,7 +14,7 @@ import com.castlefrog.games.asg.view.GameView
 class GameActivity : AppCompatActivity() {
 
     companion object {
-        val ARG_GAME = "game"
+        private const val ARG_GAME = "game"
 
         fun navigate(context: Context, game: Game) {
             val intent = Intent(context, GameActivity::class.java)
@@ -29,8 +29,7 @@ class GameActivity : AppCompatActivity() {
             GameView(
                 infoClickListener = {},
             ) {
-                val extras = intent.extras
-                val game : Game = extras?.getSerializable(ARG_GAME) as Game
+                val game : Game? = intent.extras?.getParcelable(ARG_GAME)
                 //val fragment = when (game.domain.type) {
                 //    DomainType.HEX -> HexFragment.newInstance(game)
                 //    DomainType.HAVANNAH -> HavannahFragment.newInstance(game)

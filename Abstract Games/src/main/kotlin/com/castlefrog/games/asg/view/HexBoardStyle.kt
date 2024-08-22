@@ -1,4 +1,4 @@
-package com.castlefrog.games.asg
+package com.castlefrog.games.asg.view
 
 enum class HexBoardStyle {
     HEXAGONS,

@@ -1,4 +1,4 @@
-package com.castlefrog.games.asg;
+package com.castlefrog.games.asg.view;
 
 import java.util.List;
 
@@ -20,6 +20,9 @@ import com.castlefrog.agl.agents.ExternalAgent;
 import com.castlefrog.agl.domains.hex.HexAction;
 import com.castlefrog.agl.domains.hex.HexState;
 import com.castlefrog.agl.domains.hex.HexSimulator;
+import com.castlefrog.games.asg.GameActivity;
+import com.castlefrog.games.asg.R;
+import com.castlefrog.games.asg.Utils;
 
 public final class HexView extends View {
     private static final int WIN_COLOR = 0xffffffff;
