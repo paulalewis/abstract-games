@@ -1,16 +1,17 @@
 package com.castlefrog.games.asg
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import com.castlefrog.games.asg.havannah.HavannahFragment
 import com.castlefrog.games.asg.hex.HexFragment
 import com.castlefrog.games.asg.model.DomainType
 import com.castlefrog.games.asg.model.Game
-import org.jetbrains.anko.*
+import com.castlefrog.games.asg.view.GameView
 
-class GameActivity : Activity() {
+class GameActivity : AppCompatActivity() {
 
     companion object {
         val ARG_GAME = "game"
@@ -24,19 +25,20 @@ class GameActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        frameLayout {
-            id = R.id.container
-            background = context.getDrawable(android.R.color.black)
+        setContent {
+            GameView(
+                infoClickListener = {},
+            ) {
+                val extras = intent.extras
+                val game : Game = extras?.getSerializable(ARG_GAME) as Game
+                //val fragment = when (game.domain.type) {
+                //    DomainType.HEX -> HexFragment.newInstance(game)
+                //    DomainType.HAVANNAH -> HavannahFragment.newInstance(game)
+                //}
+                //fragmentManager.beginTransaction()
+                //    .replace(R.id.container, fragment, null)
+                //    .commit()
+            }
         }
-        val extras = intent.extras
-        val game : Game = extras.getSerializable(ARG_GAME) as Game
-        val fragment = when (game.domain.type) {
-            DomainType.HEX -> HexFragment.newInstance(game)
-            DomainType.HAVANNAH -> HavannahFragment.newInstance(game)
-        }
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment, null)
-                .commit()
     }
-
 }

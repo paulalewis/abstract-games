@@ -11,10 +11,9 @@ import com.castlefrog.agl.agents.RandomAgent
 import com.castlefrog.agl.domains.hex.HexState
 import com.castlefrog.games.asg.HexGridView
 import com.castlefrog.games.asg.R
-import com.castlefrog.games.asg.hexGridView
+// import com.castlefrog.games.asg.hexGridView
 import com.castlefrog.games.asg.model.Game
 import java.util.*
-import org.jetbrains.anko.*
 
 class HexFragment : Fragment(), HexView {
 
@@ -50,7 +49,7 @@ class HexFragment : Fragment(), HexView {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        return UI {
+        /*return UI {
             verticalLayout {
                 toolbar {
                     title = resources.getString(R.string.hex)
@@ -86,7 +85,8 @@ class HexFragment : Fragment(), HexView {
                     }
                 }
             }
-        }.view
+        }.view*/
+        return null
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
